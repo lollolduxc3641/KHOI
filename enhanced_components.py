@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Enhanced Components cho hệ thống khóa bảo mật
-Phiên bản tối ưu - Loại bỏ icon và cải thiện logic
+Phiên bản tối ưu - Minimal fixes for focus issues
 """
 
 import cv2
@@ -80,7 +80,7 @@ class EnhancedBuzzerManager:
             
             threading.Thread(target=beep_thread, daemon=True).start()
 
-# ==== ENHANCED NUMPAD DIALOG ====
+# ==== ENHANCED NUMPAD DIALOG - MINIMAL FOCUS FIX ====
 class EnhancedNumpadDialog:
     def __init__(self, parent, title, prompt, is_password=False, buzzer=None):
         self.parent = parent
@@ -103,6 +103,10 @@ class EnhancedNumpadDialog:
         self.dialog.transient(self.parent)
         self.dialog.grab_set()
         
+        # MINIMAL FOCUS FIX - CHỈ THÊM 2 DÒNG NÀY
+        self.dialog.lift()
+        self.dialog.focus_force()
+        
         # Center dialog
         x = (self.dialog.winfo_screenwidth() // 2) - 300
         y = (self.dialog.winfo_screenheight() // 2) - 375
@@ -111,6 +115,9 @@ class EnhancedNumpadDialog:
         self._create_widgets()
         self._setup_bindings()
         self._highlight_button()
+        
+        # MINIMAL FOCUS FIX - CHỈ THÊM 1 DÒNG NÀY
+        self.dialog.after(100, lambda: self.dialog.focus_force())
         
         self.dialog.wait_window()
         return self.result
@@ -187,11 +194,11 @@ class EnhancedNumpadDialog:
             self.dialog.bind(str(i), lambda e, key=str(i): self._on_key_click(key))
             self.dialog.bind(f'<KP_{i}>', lambda e, key=str(i): self._on_key_click(key))
         
-        # Phím đặc biệt - ĐÃ TỐI ƯU
+        # Phím đặc biệt
         self.dialog.bind('<Return>', lambda e: self._on_ok())
         self.dialog.bind('<KP_Enter>', lambda e: self._on_ok())
-        self.dialog.bind('<period>', lambda e: self._on_cancel())  # Dấu "." để thoát
-        self.dialog.bind('<KP_Decimal>', lambda e: self._on_cancel())  # Dấu "." trên keypad
+        self.dialog.bind('<period>', lambda e: self._on_cancel())
+        self.dialog.bind('<KP_Decimal>', lambda e: self._on_cancel())
         self.dialog.bind('<Escape>', lambda e: self._on_cancel())
         self.dialog.bind('<BackSpace>', lambda e: self._on_key_click('XOA'))
         self.dialog.bind('<Delete>', lambda e: self._on_key_click('CLR'))
@@ -285,7 +292,7 @@ class EnhancedNumpadDialog:
         self.result = None
         self.dialog.destroy()
 
-# ==== ENHANCED MESSAGE BOX - TỐI ƯU ====
+# ==== ENHANCED MESSAGE BOX - MINIMAL FOCUS FIX ====
 class EnhancedMessageBox:
     @staticmethod
     def show_info(parent, title, message, buzzer=None):
@@ -311,6 +318,10 @@ class EnhancedMessageBox:
         dialog.configure(bg=Colors.DARK_BG)
         dialog.transient(parent)
         dialog.grab_set()
+        
+        # MINIMAL FOCUS FIX - CHỈ THÊM 2 DÒNG NÀY
+        dialog.lift()
+        dialog.focus_force()
         
         x = (dialog.winfo_screenwidth() // 2) - 325
         y = (dialog.winfo_screenheight() // 2) - 200
@@ -381,7 +392,7 @@ class EnhancedMessageBox:
         def activate_selected():
             btn_widgets[selected[0]].invoke()
         
-        # TỐI ƯU BINDINGS
+        # Bindings
         for i in range(len(buttons)):
             dialog.bind(str(i+1), lambda e, idx=i: btn_widgets[idx].invoke())
         
@@ -389,19 +400,23 @@ class EnhancedMessageBox:
         dialog.bind('<Right>', lambda e: navigate_buttons(1))
         dialog.bind('<Tab>', lambda e: navigate_buttons(1))
         dialog.bind('<Shift-Tab>', lambda e: navigate_buttons(-1))
-        dialog.bind('<Return>', lambda e: activate_selected())  # Enter để xác nhận
+        dialog.bind('<Return>', lambda e: activate_selected())
         dialog.bind('<KP_Enter>', lambda e: activate_selected())
-        dialog.bind('<period>', lambda e: close_dialog(None))  # Dấu "." để thoát
+        dialog.bind('<period>', lambda e: close_dialog(None))
         dialog.bind('<KP_Decimal>', lambda e: close_dialog(None))
         dialog.bind('<Escape>', lambda e: close_dialog(None))
         dialog.bind('<space>', lambda e: activate_selected())
         
         select_button(0)
         dialog.focus_set()
+        
+        # MINIMAL FOCUS FIX - CHỈ THÊM 1 DÒNG NÀY
+        dialog.after(100, lambda: dialog.focus_force())
+        
         dialog.wait_window()
         return result[0]
 
-# ==== ADMIN DATA MANAGER ====
+# ==== ADMIN DATA MANAGER - KHÔNG THAY ĐỔI ====
 class AdminDataManager:
     def __init__(self, data_path: str):
         self.data_path = data_path
@@ -479,14 +494,13 @@ class AdminDataManager:
             return self._save_data()
         return False
 
-# ==== IMPROVED ADMIN GUI - ĐÃ TỐI ƯU ====
+# ==== IMPROVED ADMIN GUI - MINIMAL FOCUS FIX ====
 class ImprovedAdminGUI:
     def __init__(self, parent, system):
         self.parent = parent
         self.system = system
         self.admin_window = None
         self.selected = 0
-        # ĐÃ XÓA CHỨC NĂNG THÊM KHUÔN MẶT
         self.options = [
             ("1", "Đổi mật khẩu hệ thống"),
             ("2", "Thêm thẻ RFID mới"), 
@@ -509,6 +523,10 @@ class ImprovedAdminGUI:
         self.admin_window.transient(self.parent)
         self.admin_window.grab_set()
         
+        # MINIMAL FOCUS FIX - CHỈ THÊM 2 DÒNG NÀY
+        self.admin_window.lift()
+        self.admin_window.focus_force()
+        
         x = (self.admin_window.winfo_screenwidth() // 2) - 400
         y = (self.admin_window.winfo_screenheight() // 2) - 325
         self.admin_window.geometry(f'800x650+{x}+{y}')
@@ -516,6 +534,9 @@ class ImprovedAdminGUI:
         self._create_widgets()
         self._setup_bindings()
         self._update_selection()
+        
+        # MINIMAL FOCUS FIX - CHỈ THÊM 1 DÒNG NÀY
+        self.admin_window.after(100, lambda: self.admin_window.focus_force())
     
     def _create_widgets(self):
         # Header
@@ -535,7 +556,6 @@ class ImprovedAdminGUI:
                  Colors.ACCENT, Colors.PRIMARY, Colors.TEXT_SECONDARY]
         
         for i, (num, text) in enumerate(self.options):
-            # CHỈ HIỂN THỊ SỐ VÀ TEXT
             btn = tk.Button(menu_frame, text=f"{num}. {text}",
                            font=('Arial', 20, 'bold'), height=2,
                            bg=colors[i % len(colors)], fg='white', relief=tk.RAISED, bd=5,
@@ -555,11 +575,11 @@ class ImprovedAdminGUI:
         self.admin_window.bind('<Tab>', lambda e: self._navigate(1))
         self.admin_window.bind('<Shift-Tab>', lambda e: self._navigate(-1))
         
-        # Action keys - TỐI ƯU
+        # Action keys
         self.admin_window.bind('<Return>', lambda e: self._confirm())
         self.admin_window.bind('<KP_Enter>', lambda e: self._confirm())
         self.admin_window.bind('<space>', lambda e: self._confirm())
-        self.admin_window.bind('<period>', lambda e: self._close())  # Dấu "." để thoát
+        self.admin_window.bind('<period>', lambda e: self._close())
         self.admin_window.bind('<KP_Decimal>', lambda e: self._close())
         self.admin_window.bind('<Escape>', lambda e: self._close())
         
@@ -588,7 +608,7 @@ class ImprovedAdminGUI:
             self._remove_rfid, 
             self._add_fingerprint,
             self._remove_fingerprint,
-            self._show_statistics,   # Chỉ còn 6 chức năng
+            self._show_statistics,
             self._close
         ]
         
@@ -648,7 +668,6 @@ class ImprovedAdminGUI:
                                    [f"Thẻ {i+1}: {uid}" for i, uid in enumerate(uids)], 
                                    lambda idx: self._do_remove_rfid(uids[idx]))
     
-
     def _add_fingerprint(self):
         EnhancedMessageBox.show_info(self.admin_window, "Đăng ký vân tay", 
                                 "Chuẩn bị đăng ký vân tay mới...", self.system.buzzer)
@@ -674,7 +693,7 @@ class ImprovedAdminGUI:
                     self.admin_window, "Bước 1/2", "Đặt ngón tay lần đầu...", self.system.buzzer))
                 
                 # Wait for first scan
-                scan_timeout = 15  # 15 seconds timeout
+                scan_timeout = 15
                 start_time = time.time()
                 
                 while not self.system.fingerprint.readImage():
@@ -696,7 +715,7 @@ class ImprovedAdminGUI:
                 while self.system.fingerprint.readImage():
                     time.sleep(0.1)
                 
-                time.sleep(1)  # Short pause
+                time.sleep(1)
                 
                 # Wait for second scan
                 start_time = time.time()
@@ -717,7 +736,6 @@ class ImprovedAdminGUI:
                 
                 # Save to admin data
                 if self.system.admin_data.add_fingerprint_id(pos):
-                    # SUCCESS - HIỂN THỊ THÔNG BÁO VÀ QUAY VỀ MENU
                     self.admin_window.after(0, lambda: self._show_success_and_return(pos))
                 else:
                     self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
@@ -728,12 +746,10 @@ class ImprovedAdminGUI:
                 self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
                     self.admin_window, "Lỗi", f"Lỗi đăng ký: {str(e)}", self.system.buzzer))
         
-        # Chạy enrollment trong thread riêng
         threading.Thread(target=enroll, daemon=True).start()
 
     def _show_success_and_return(self, pos):
         """Hiển thị thông báo thành công và quay về menu admin"""
-        # Hiển thị thông báo thành công
         EnhancedMessageBox.show_success(
             self.admin_window, 
             "Thành công", 
@@ -741,12 +757,10 @@ class ImprovedAdminGUI:
             self.system.buzzer
         )
         
-        # ĐÓNG CỬA SỔ ADMIN HIỆN TẠI VÀ MỞ LẠI MENU
         if self.admin_window:
             self.admin_window.destroy()
             self.admin_window = None
         
-        # Delay ngắn rồi mở lại admin panel
         self.system.root.after(500, self.show_admin_panel)
     
     def _remove_fingerprint(self):
@@ -761,9 +775,7 @@ class ImprovedAdminGUI:
                                    lambda idx: self._do_remove_fingerprint(fp_ids[idx]))
     
     def _show_statistics(self):
-        """Hiển thị thống kê hệ thống - CẢI THIỆN"""
         try:
-            # Get stats
             face_info = self.system.face_recognizer.get_database_info()
             rfid_count = len(self.system.admin_data.get_rfid_uids())
             fp_count = len(self.system.admin_data.get_fingerprint_ids())
@@ -791,13 +803,17 @@ Bảo mật:
                                         f"Không thể lấy thống kê: {e}", self.system.buzzer)
     
     def _show_selection_dialog(self, title, items, callback):
-        """Dialog chọn item - ĐÃ TỐI ƯU"""
+        """Dialog chọn item - MINIMAL FOCUS FIX"""
         sel_window = tk.Toplevel(self.admin_window)
         sel_window.title(title)
         sel_window.geometry("600x500")
         sel_window.configure(bg=Colors.DARK_BG)
         sel_window.transient(self.admin_window)
         sel_window.grab_set()
+        
+        # MINIMAL FOCUS FIX - CHỈ THÊM 2 DÒNG NÀY
+        sel_window.lift()
+        sel_window.focus_force()
         
         x = (sel_window.winfo_screenwidth() // 2) - 300
         y = (sel_window.winfo_screenheight() // 2) - 250
@@ -818,7 +834,7 @@ Bảo mật:
         list_frame = tk.Frame(sel_window, bg=Colors.CARD_BG)
         list_frame.pack(fill=tk.BOTH, expand=True, padx=25, pady=25)
         
-        # Buttons - CHỈ SỐ VÀ TEXT
+        # Buttons
         for i, item in enumerate(items):
             btn = tk.Button(list_frame, text=f"{i+1}. {item}",
                            font=('Arial', 18, 'bold'), height=2,
@@ -849,7 +865,7 @@ Bảo mật:
         def activate():
             buttons[selected[0]].invoke()
         
-        # Bindings - TỐI ƯU
+        # Bindings
         for i in range(len(items)):
             sel_window.bind(str(i+1), lambda e, idx=i: buttons[idx].invoke())
         
@@ -860,12 +876,15 @@ Bảo mật:
         sel_window.bind('<Return>', lambda e: activate())
         sel_window.bind('<KP_Enter>', lambda e: activate())
         sel_window.bind('<space>', lambda e: activate())
-        sel_window.bind('<period>', lambda e: sel_window.destroy())  # Dấu "." để thoát
+        sel_window.bind('<period>', lambda e: sel_window.destroy())
         sel_window.bind('<KP_Decimal>', lambda e: sel_window.destroy())
         sel_window.bind('<Escape>', lambda e: sel_window.destroy())
         
         update_selection()
         sel_window.focus_set()
+        
+        # MINIMAL FOCUS FIX - CHỈ THÊM 1 DÒNG NÀY
+        sel_window.after(100, lambda: sel_window.focus_force())
     
     def _do_remove_rfid(self, uid):
         if EnhancedMessageBox.ask_yesno(self.admin_window, "Xác nhận", 
