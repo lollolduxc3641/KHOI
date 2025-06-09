@@ -1128,7 +1128,7 @@ if __name__ == "__main__":
         
         print()
         print("TAT CA THANH PHAN DA SAN SANG!")  # XÓA ICON ✅
-        print("Đang khởi động giao diện ...")  # XÓA ICON 🎨
+        print("Đang khởi động giao diện AI...")  # XÓA ICON 🎨
         print("Kết nối hardware thành công!")  # XÓA ICON 📡
         print("  neural networks đã được load!")  # XÓA ICON 🤖
         print("=" * 100)
