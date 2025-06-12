@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from enum import Enum
 import sys
 import numpy as np
+import asyncio
 
 # Import modules của dự án
 try:
@@ -29,11 +30,13 @@ try:
         Colors, EnhancedBuzzerManager, EnhancedNumpadDialog, 
         EnhancedMessageBox, AdminDataManager, ImprovedAdminGUI
     )
+    from discord_integration import DiscordSecurityBot  # THÊM DÒNG NÀY
 except ImportError as e:
     print(f"❌ Lỗi import modules: {e}")
     print("🔧 Đảm bảo các file sau tồn tại:")
     print("   - improved_face_recognition.py")
     print("   - enhanced_components.py")
+    print("   - discord_integration.py")  # THÊM DÒNG NÀY
     sys.exit(1)
 
 # Hardware imports
@@ -484,6 +487,33 @@ class AIEnhancedSecurityGUI:
 
 # ==== AI ENHANCED SECURITY SYSTEM - FIXED FOCUS ====
 class AIEnhancedSecuritySystem:
+    def _init_discord_bot(self):
+        """Khởi tạo Discord bot integration"""
+        try:
+            logger.info("Khởi tạo Discord bot integration...")
+            
+            self.discord_bot = DiscordSecurityBot(self)
+            
+            logger.info("Discord bot integration đã sẵn sàng")
+            
+        except Exception as e:
+            logger.error(f"Lỗi khởi tạo Discord bot: {e}")
+            logger.info("Tiếp tục chạy mà không có Discord bot...")
+            self.discord_bot = None
+    def _send_discord_notification(self, message):
+        """Helper function để gửi Discord notification từ sync context"""
+        try:
+            if self.discord_bot and self.discord_bot.bot:
+                # Tạo event loop mới cho thread này
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                
+                # Chạy notification
+                loop.run_until_complete(self.discord_bot.send_notification(message))
+                loop.close()
+                
+        except Exception as e:
+            logger.error(f"Discord notification error: {e}")       
     def __init__(self):
         self.config = Config()
         logger.info("Khởi tạo AI Enhanced Security System...")  # XÓA ICON 🤖
@@ -491,6 +521,9 @@ class AIEnhancedSecuritySystem:
         self._init_hardware()
         self._init_components()
         self._init_gui()
+
+        self._init_discord_bot()
+
         
         self.auth_state = {
             "step": AuthStep.FACE,
@@ -498,6 +531,14 @@ class AIEnhancedSecuritySystem:
             "fingerprint_attempts": 0,
             "rfid_attempts": 0,
             "pin_attempts": 0
+        }
+
+        self.failed_attempts = {
+        "face": 0,
+        "fingerprint": 0, 
+        "rfid": 0,
+        "pin": 0,
+        "total_today": 0
         }
         
         self.running = True
@@ -956,31 +997,37 @@ class AIEnhancedSecuritySystem:
     def _unlock_door(self):
         """Mở khóa cửa với countdown"""
         try:
-            logger.info(f"Unlocking door for {self.config.LOCK_OPEN_DURATION} seconds")  # XÓA ICON 🚪
+            logger.info(f"Unlocking door for {self.config.LOCK_OPEN_DURATION} seconds")
             
-            # XÓA ICON
             self.gui.update_step(4, "COMPLETED", "DOOR UNLOCKED", Colors.SUCCESS)
             self.gui.update_status(f"DOOR OPEN - AUTO LOCK IN {self.config.LOCK_OPEN_DURATION}S", 'lightgreen')
             
             self.relay.off()  # Unlock door
             self.buzzer.beep("success")
             
+            # THÊM DISCORD NOTIFICATION
+            if self.discord_bot:
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=("🔓 **CỬA ĐÃ MỞ** - 4-layer authentication completed successfully!",),
+                    daemon=True
+                ).start()
+            
             # Countdown với hiệu ứng
             for i in range(self.config.LOCK_OPEN_DURATION, 0, -1):
                 self.root.after((self.config.LOCK_OPEN_DURATION - i) * 1000, 
-                               lambda t=i: self.gui.update_detail(f"Door is open - Auto lock in {t} seconds\nPlease enter and close the door", Colors.SUCCESS))
+                            lambda t=i: self.gui.update_detail(f"Door is open - Auto lock in {t} seconds\nPlease enter and close the door", Colors.SUCCESS))
                 self.root.after((self.config.LOCK_OPEN_DURATION - i) * 1000,
-                               lambda t=i: self.gui.update_status(f"DOOR OPEN - LOCK IN {t}S", 'lightgreen'))
+                            lambda t=i: self.gui.update_status(f"DOOR OPEN - LOCK IN {t}S", 'lightgreen'))
                 
-                # Warning beeps for last 3 seconds
                 if i <= 3:
                     self.root.after((self.config.LOCK_OPEN_DURATION - i) * 1000,
-                                   lambda: self.buzzer.beep("click"))
+                                lambda: self.buzzer.beep("click"))
             
             self.root.after(self.config.LOCK_OPEN_DURATION * 1000, self._lock_door)
             
         except Exception as e:
-            logger.error(f"Door unlock error: {e}")  # XÓA ICON ❌
+            logger.error(f"Door unlock error: {e}")
             self.gui.update_detail(f"Door unlock error: {str(e)}", Colors.ERROR)
             self.buzzer.beep("error")
     
@@ -1008,11 +1055,19 @@ class AIEnhancedSecuritySystem:
         """Chạy hệ thống chính"""
         try:
             logger.info("Starting AI Enhanced Security System")  # XÓA ICON 🚀
-            
+
+            if self.discord_bot:
+                logger.info("Đang khởi động Discord bot...")
+            if self.discord_bot.start_bot():
+                logger.info("✅ Discord bot đã khởi động thành công!")
+            else:
+                logger.warning("⚠️ Không thể khởi động Discord bot")
+
             # Startup effects - XÓA ICON
             self.gui.update_status("AI ENHANCED SECURITY SYSTEM v2.1 - READY!", 'lightgreen')
             self.gui.update_detail("AI neural networks loaded and ready\n"
                                  "4-layer security system active\n"
+                                 "Discord bot integration enabled\n"  # THÊM DÒNG NÀY
                                  "Enhanced performance for Raspberry Pi 5", Colors.SUCCESS)
             
             self.buzzer.beep("startup")
@@ -1041,29 +1096,34 @@ class AIEnhancedSecuritySystem:
     
     def cleanup(self):
         """Cleanup tài nguyên khi thoát"""
-        logger.info("Cleaning up system resources...")  # XÓA ICON 🔧
+        logger.info("Cleaning up system resources...")
         self.running = False
         
         try:
+            # THÊM CLEANUP DISCORD BOT
+            if hasattr(self, 'discord_bot') and self.discord_bot:
+                self.discord_bot.stop_bot()
+                logger.info("Discord bot stopped")
+            
             if hasattr(self, 'picam2'):
                 self.picam2.stop()
-                logger.info("Camera stopped")  # XÓA ICON 📹
+                logger.info("Camera stopped")
                 
             if hasattr(self, 'relay'):
                 self.relay.on()  # Ensure door is locked
-                logger.info("Door locked")  # XÓA ICON 🔒
+                logger.info("Door locked")
                 
             if hasattr(self, 'buzzer') and hasattr(self.buzzer, 'buzzer') and self.buzzer.buzzer:
                 self.buzzer.buzzer.off()
-                logger.info("Buzzer stopped")  # XÓA ICON 🔇
+                logger.info("Buzzer stopped")
                 
         except Exception as e:
-            logger.error(f"Cleanup error: {e}")  # XÓA ICON ❌
+            logger.error(f"Cleanup error: {e}")
         
         if hasattr(self, 'root'):
             self.root.quit()
         
-        logger.info("Cleanup completed")  # XÓA ICON ✅
+        logger.info("Cleanup completed")
 
 # ==== MAIN EXECUTION ====
 if __name__ == "__main__":
