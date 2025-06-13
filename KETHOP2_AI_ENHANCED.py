@@ -487,6 +487,7 @@ class AIEnhancedSecurityGUI:
 
 # ==== AI ENHANCED SECURITY SYSTEM - FIXED FOCUS ====
 class AIEnhancedSecuritySystem:
+    
     def _init_discord_bot(self):
         """Khởi tạo Discord bot integration"""
         try:
@@ -759,20 +760,15 @@ class AIEnhancedSecuritySystem:
         threading.Thread(target=self._fingerprint_loop, daemon=True).start()
     
     def _fingerprint_loop(self):
-        """Fingerprint verification loop"""
+        """FIXED: Fingerprint loop với Discord alerts"""
         while (self.auth_state["fingerprint_attempts"] < self.config.MAX_ATTEMPTS and 
-               self.auth_state["step"] == AuthStep.FINGERPRINT):
+            self.auth_state["step"] == AuthStep.FINGERPRINT):
             
             try:
                 self.auth_state["fingerprint_attempts"] += 1
                 attempt_msg = f"Attempt {self.auth_state['fingerprint_attempts']}/{self.config.MAX_ATTEMPTS}"
                 
-                # XÓA ICON
                 self.root.after(0, lambda: self.gui.update_step(2, "FINGERPRINT", attempt_msg, Colors.WARNING))
-                self.root.after(0, lambda: self.gui.update_detail(
-                    f"Scanning fingerprint... (Attempt {self.auth_state['fingerprint_attempts']}/{self.config.MAX_ATTEMPTS})\n"
-                    "Please hold finger steady on sensor.", 
-                    Colors.WARNING))
                 
                 timeout = 10
                 start_time = time.time()
@@ -783,15 +779,20 @@ class AIEnhancedSecuritySystem:
                         result = self.fingerprint.searchTemplate()
                         
                         if result[0] != -1:
-                            # Success
-                            logger.info(f"Fingerprint verified: ID {result[0]}")  # XÓA ICON ✅
+                            # SUCCESS
+                            logger.info(f"Fingerprint verified: ID {result[0]}")
                             self.buzzer.beep("success")
                             self.root.after(0, lambda: self.gui.update_status("FINGERPRINT VERIFIED! PROCEEDING TO RFID...", 'lightgreen'))
-                            self.root.after(0, lambda: self.gui.update_detail(f"Fingerprint authentication successful!\nTemplate ID: {result[0]}\nMatch score: {result[1]}", Colors.SUCCESS))
                             self.root.after(1500, self._proceed_to_rfid)
                             return
                         else:
-                            # Wrong fingerprint
+                            # FAILURE - Send Discord alert
+                            details = f"Template not found | Sensor reading: {result[1]}"
+                            logger.warning(f"Fingerprint not recognized: attempt {self.auth_state['fingerprint_attempts']}")
+                            
+                            # Send Discord alert
+                            self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
+                            
                             self.buzzer.beep("error")
                             remaining = self.config.MAX_ATTEMPTS - self.auth_state["fingerprint_attempts"]
                             if remaining > 0:
@@ -802,22 +803,40 @@ class AIEnhancedSecuritySystem:
                     time.sleep(0.1)
                 
                 if time.time() - start_time >= timeout:
-                    # Timeout
+                    # TIMEOUT - Send Discord alert
+                    details = f"Scan timeout - no finger detected ({timeout}s)"
+                    logger.warning(f"Fingerprint timeout: attempt {self.auth_state['fingerprint_attempts']}")
+                    
+                    # Send Discord alert
+                    self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
+                    
                     remaining = self.config.MAX_ATTEMPTS - self.auth_state["fingerprint_attempts"]
                     if remaining > 0:
                         self.root.after(0, lambda: self.gui.update_detail(
                             f"Scan timeout!\n{remaining} attempts remaining\nPlease place finger properly on sensor.", Colors.WARNING))
                         time.sleep(1)
-                
+                    
             except Exception as e:
-                logger.error(f"Fingerprint error: {e}")  # XÓA ICON ❌
+                # HARDWARE ERROR - Send Discord alert
+                details = f"Hardware error: {str(e)}"
+                logger.error(f"Fingerprint error: {e}")
+                
+                # Send Discord alert
+                self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
+                
                 self.root.after(0, lambda: self.gui.update_detail(f"Sensor error: {str(e)}", Colors.ERROR))
                 time.sleep(1)
         
-        # Out of attempts
-        logger.warning("Fingerprint: Hết lượt thử")  # XÓA ICON ⚠️
+        # OUT OF ATTEMPTS
+        if self.auth_state["fingerprint_attempts"] >= self.config.MAX_ATTEMPTS:
+            details = f"Maximum fingerprint attempts exceeded ({self.config.MAX_ATTEMPTS})"
+            logger.critical(f"Fingerprint max attempts exceeded: {self.auth_state['fingerprint_attempts']}")
+            
+            # Send critical Discord alert
+            self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
+        
+        logger.warning("Fingerprint: Maximum attempts exceeded")
         self.root.after(0, lambda: self.gui.update_status("FINGERPRINT FAILED - RESTARTING AUTHENTICATION", 'orange'))
-        self.root.after(0, lambda: self.gui.update_detail("Maximum fingerprint attempts exceeded.\nRestarting authentication process...", Colors.ERROR))
         self.buzzer.beep("error")
         self.root.after(3000, self.start_authentication)
     
@@ -835,26 +854,27 @@ class AIEnhancedSecuritySystem:
         threading.Thread(target=self._rfid_loop, daemon=True).start()
     
     def _rfid_loop(self):
-        """RFID verification loop"""
+        """RFID verification loop với FIXED Discord alerts"""
         while (self.auth_state["rfid_attempts"] < self.config.MAX_ATTEMPTS and 
-               self.auth_state["step"] == AuthStep.RFID):
+            self.auth_state["step"] == AuthStep.RFID):
             
             try:
                 self.auth_state["rfid_attempts"] += 1
                 attempt_msg = f"Attempt {self.auth_state['rfid_attempts']}/{self.config.MAX_ATTEMPTS}"
                 
-                # XÓA ICON
+                # Update GUI
                 self.root.after(0, lambda: self.gui.update_step(3, "RFID SCAN", attempt_msg, Colors.ACCENT))
                 self.root.after(0, lambda: self.gui.update_detail(
                     f"Scanning for RFID card... (Attempt {self.auth_state['rfid_attempts']}/{self.config.MAX_ATTEMPTS})\n"
                     "Hold card within 2-5cm of reader.", 
                     Colors.ACCENT))
                 
+                # Scan for RFID card
                 uid = self.pn532.read_passive_target(timeout=8)
                 
                 if uid:
                     uid_list = list(uid)
-                    logger.info(f"RFID detected: {uid_list}")  # XÓA ICON 📱
+                    logger.info(f"RFID detected: {uid_list}")
                     
                     # Check admin card
                     if uid_list == self.config.ADMIN_UID:
@@ -864,50 +884,262 @@ class AIEnhancedSecuritySystem:
                     # Check regular cards
                     valid_uids = self.admin_data.get_rfid_uids()
                     if uid_list in valid_uids:
-                        logger.info(f"RFID verified: {uid_list}")  # XÓA ICON ✅
+                        # SUCCESS
+                        logger.info(f"RFID verified: {uid_list}")
                         self.buzzer.beep("success")
                         self.root.after(0, lambda: self.gui.update_status("RFID VERIFIED! ENTER PASSCODE...", 'lightgreen'))
                         self.root.after(0, lambda: self.gui.update_detail(f"RFID card authentication successful!\nCard UID: {uid_list}\nProceeding to final passcode step.", Colors.SUCCESS))
                         self.root.after(1500, self._proceed_to_passcode)
                         return
                     else:
-                        # Invalid card
+                        # FAILURE - Unauthorized card - SEND DISCORD ALERT
+                        details = f"Unauthorized card | UID: {uid_list} | Not in database"
+                        logger.warning(f"RFID unauthorized: {uid_list}")
+                        
+                        # Send Discord alert
+                        self._send_discord_failure_alert("rfid", self.auth_state['rfid_attempts'], details)
+                        
                         self.buzzer.beep("error")
                         remaining = self.config.MAX_ATTEMPTS - self.auth_state["rfid_attempts"]
+                        
+                        error_msg = f"❌ UNAUTHORIZED RFID CARD!\n"
+                        error_msg += f"📱 Detected UID: {uid_list}\n"
+                        error_msg += f"⚠️ Card not registered in system\n"
+                        error_msg += f"🔄 {remaining} attempts remaining" if remaining > 0 else "🚫 No attempts remaining"
+                        
+                        self.root.after(0, lambda: self.gui.update_detail(error_msg, Colors.ERROR))
+                        
                         if remaining > 0:
-                            self.root.after(0, lambda: self.gui.update_detail(
-                                f"Unauthorized RFID card!\nUID: {uid_list}\n{remaining} attempts remaining", Colors.ERROR))
-                            time.sleep(2)
+                            time.sleep(3)
+                        else:
+                            break
                 else:
-                    # No card detected
+                    # FAILURE - No card detected - SEND DISCORD ALERT
+                    details = f"No RFID card detected within timeout ({8}s)"
+                    logger.warning(f"RFID timeout: attempt {self.auth_state['rfid_attempts']}")
+                    
+                    # Send Discord alert  
+                    self._send_discord_failure_alert("rfid", self.auth_state['rfid_attempts'], details)
+                    
                     remaining = self.config.MAX_ATTEMPTS - self.auth_state["rfid_attempts"]
+                    
+                    timeout_msg = f"⏰ NO CARD DETECTED!\n"
+                    timeout_msg += f"🕐 Scan timeout after {8} seconds\n"
+                    timeout_msg += f"📱 Please present card closer to reader\n"
+                    timeout_msg += f"🔄 {remaining} attempts remaining" if remaining > 0 else "🚫 No attempts remaining"
+                    
+                    self.root.after(0, lambda: self.gui.update_detail(timeout_msg, Colors.WARNING))
+                    
                     if remaining > 0:
-                        self.root.after(0, lambda: self.gui.update_detail(
-                            f"No card detected!\n{remaining} attempts remaining\nPlease present card closer to reader.", Colors.WARNING))
-                        time.sleep(1)
-                
+                        time.sleep(2)
+                    else:
+                        break
+                    
             except Exception as e:
-                logger.error(f"RFID error: {e}")  # XÓA ICON ❌
-                self.root.after(0, lambda: self.gui.update_detail(f"RFID reader error: {str(e)}", Colors.ERROR))
-                time.sleep(1)
+                # HARDWARE ERROR - SEND DISCORD ALERT
+                details = f"RFID hardware error: {str(e)}"
+                logger.error(f"RFID error: {e}")
+                
+                # Send Discord alert
+                self._send_discord_failure_alert("rfid", self.auth_state['rfid_attempts'], details)
+                
+                self.root.after(0, lambda: self.gui.update_detail(f"🔧 RFID READER ERROR!\n{str(e)}\nPlease check hardware connection", Colors.ERROR))
+                time.sleep(2)
         
-        # Out of attempts
-        logger.warning("RFID: Hết lượt thử")  # XÓA ICON ⚠️
+        # OUT OF ATTEMPTS - SEND FINAL DISCORD ALERT
+        if self.auth_state["rfid_attempts"] >= self.config.MAX_ATTEMPTS:
+            details = f"Maximum RFID attempts exceeded ({self.config.MAX_ATTEMPTS}) | Possible intrusion attempt"
+            logger.critical(f"RFID max attempts exceeded: {self.auth_state['rfid_attempts']}")
+            
+            # Send critical Discord alert
+            self._send_discord_failure_alert("rfid", self.auth_state['rfid_attempts'], details)
+        
+        logger.warning("RFID: Maximum attempts exceeded - Restarting authentication")
         self.root.after(0, lambda: self.gui.update_status("RFID FAILED - RESTARTING AUTHENTICATION", 'orange'))
-        self.root.after(0, lambda: self.gui.update_detail("Maximum RFID attempts exceeded.\nRestarting authentication process...", Colors.ERROR))
+        self.root.after(0, lambda: self.gui.update_detail(
+            "❌ RFID AUTHENTICATION FAILED!\n"
+            f"🚫 All {self.config.MAX_ATTEMPTS} attempts exhausted\n"
+            "🔄 Restarting full authentication process...\n"
+            "🛡️ Security event logged", Colors.ERROR))
         self.buzzer.beep("error")
-        self.root.after(3000, self.start_authentication)
+        self.root.after(4000, self.start_authentication)
     
-    def _admin_authentication(self):
-        """Admin authentication via RFID - FIXED FOCUS"""
-        # FORCE FOCUS TRƯỚC KHI MỞ DIALOG
+    def _proceed_to_passcode(self):
+        """Chuyển sang bước cuối - passcode với enhanced security"""
+        logger.info("Proceeding to final passcode authentication step")
+        self.auth_state["step"] = AuthStep.PASSCODE
+        self.auth_state["pin_attempts"] = 0
+        
+        # Discord notification về bước cuối
+        if self.discord_bot:
+            threading.Thread(
+                target=self._send_discord_notification,
+                args=("🔑 **FINAL AUTHENTICATION STEP**\nProceeding to passcode entry\nUser has passed 3/4 security layers ✅",),
+                daemon=True
+            ).start()
+        
+        self.gui.update_step(4, "FINAL PASSCODE", "Enter system passcode", Colors.SUCCESS)
+        self.gui.update_status("ENTER FINAL PASSCODE...", 'lightgreen')
+        self.gui.update_detail(
+            "🔑 FINAL AUTHENTICATION STEP\n"
+            "✅ Face Recognition: PASSED\n"
+            "✅ Fingerprint: PASSED\n" 
+            "✅ RFID Card: PASSED\n"
+            "🔄 Passcode: PENDING\n\n"
+            "Enter your numeric passcode to complete authentication.", 
+            Colors.SUCCESS)
+        
+        self._request_passcode()
+
+    def _request_passcode(self):
+        """FIXED: Passcode input với Discord alerts"""
+        
+        # Check max attempts
+        if self.auth_state["pin_attempts"] >= self.config.MAX_ATTEMPTS:
+            # Send final critical alert
+            details = f"Maximum passcode attempts exceeded ({self.config.MAX_ATTEMPTS}) | Final authentication step failed"
+            logger.critical(f"Passcode max attempts exceeded: {self.auth_state['pin_attempts']}")
+            
+            # Send Discord alert
+            self._send_discord_failure_alert("passcode", self.auth_state['pin_attempts'], details)
+            
+            logger.warning("Passcode: Maximum attempts exceeded")
+            self.gui.update_status("PASSCODE FAILED - RESTARTING", 'orange')
+            self.gui.update_detail(
+                "🚫 PASSCODE AUTHENTICATION FAILED!\n"
+                f"❌ All {self.config.MAX_ATTEMPTS} attempts exhausted\n"
+                "⚠️ User passed all other security layers\n"
+                "🔄 Restarting full authentication process...\n"
+                "🛡️ Critical security event logged", Colors.ERROR)
+            self.buzzer.beep("error")
+            self.root.after(4000, self.start_authentication)
+            return
+        
+        # Increment attempt counter
+        self.auth_state["pin_attempts"] += 1
+        attempt_msg = f"Attempt {self.auth_state['pin_attempts']}/{self.config.MAX_ATTEMPTS}"
+        
+        # Update GUI
+        self.gui.update_step(4, "PASSCODE", attempt_msg, Colors.SUCCESS)
+        self.gui.update_detail(
+            f"🔑 Enter system passcode... (Attempt {self.auth_state['pin_attempts']}/{self.config.MAX_ATTEMPTS})\n"
+            "✅ Previous steps completed successfully\n"
+            "🎯 Use the numeric keypad to enter your code\n"
+            "⚠️ This is the final authentication step", Colors.SUCCESS)
+        
+        # FORCE FOCUS
         self.root.focus_force()
         self.root.update()
         
-        dialog = EnhancedNumpadDialog(self.root, "ADMIN RFID ACCESS",  # XÓA ICON 🔧
-                                    "Admin card detected. Enter password:", True, self.buzzer)
+        # Show dialog
+        dialog = EnhancedNumpadDialog(
+            self.root, 
+            "🔑 FINAL AUTHENTICATION",
+            f"Enter system passcode (Attempt {self.auth_state['pin_attempts']}/{self.config.MAX_ATTEMPTS}):", 
+            True, 
+            self.buzzer
+        )
         
-        # FORCE FOCUS CHO DIALOG
+        if hasattr(dialog, 'dialog'):
+            dialog.dialog.focus_force()
+            dialog.dialog.grab_set()
+            dialog.dialog.lift()
+        
+        # Get input
+        entered_pin = dialog.show()
+        
+        if entered_pin is None:
+            # User cancelled
+            logger.info("Passcode entry cancelled by user")
+            self.gui.update_detail("❌ Passcode entry cancelled\n🔄 Restarting authentication...", Colors.WARNING)
+            self.buzzer.beep("click")
+            self.root.after(2000, self.start_authentication)
+            return
+        
+        # Validate passcode
+        correct_passcode = self.admin_data.get_passcode()
+        
+        if entered_pin == correct_passcode:
+            # SUCCESS
+            logger.info("✅ Passcode verified - FULL AUTHENTICATION COMPLETE!")
+            self.gui.update_status("AUTHENTICATION COMPLETE! UNLOCKING DOOR...", 'lightgreen')
+            self.gui.update_detail(
+                "🎉 AUTHENTICATION SUCCESSFUL!\n"
+                "✅ All 4 security layers verified:\n"
+                "  👤 Face Recognition: PASSED\n"
+                "  👆 Fingerprint: PASSED\n"
+                "  📱 RFID Card: PASSED\n"
+                "  🔑 Passcode: PASSED\n\n"
+                "🔓 Door unlocking now...", Colors.SUCCESS)
+            self.buzzer.beep("success")
+            
+            # Send success notification to Discord
+            if self.discord_bot:
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=("🔓 **AUTHENTICATION COMPLETED** - All 4 layers verified successfully!",),
+                    daemon=True
+                ).start()
+            
+            self._unlock_door()
+            
+        else:
+            # FAILURE - Wrong passcode - SEND DISCORD ALERT
+            remaining = self.config.MAX_ATTEMPTS - self.auth_state["pin_attempts"]
+            
+            details = f"Incorrect passcode | Expected length: {len(correct_passcode)}, Got: {len(entered_pin)} | User reached final step"
+            logger.warning(f"Passcode incorrect: attempt {self.auth_state['pin_attempts']}")
+            
+            # Send Discord alert
+            self._send_discord_failure_alert("passcode", self.auth_state['pin_attempts'], details)
+            
+            self.buzzer.beep("error")
+            
+            if remaining > 0:
+                # Still have attempts
+                error_msg = f"❌ INCORRECT PASSCODE!\n"
+                error_msg += f"🔢 Passcode does not match system records\n"
+                error_msg += f"🔄 {remaining} attempts remaining\n"
+                error_msg += f"⚠️ Please verify your passcode and try again\n"
+                error_msg += f"🛡️ This attempt has been logged"
+                
+                self.gui.update_detail(error_msg, Colors.ERROR)
+                self.root.after(2500, self._request_passcode)
+            else:
+                # No attempts left
+                final_error_msg = f"🚫 PASSCODE AUTHENTICATION FAILED!\n"
+                final_error_msg += f"❌ All {self.config.MAX_ATTEMPTS} attempts exhausted\n"
+                final_error_msg += f"⚠️ User completed 3/4 security layers but failed final step\n"
+                final_error_msg += f"🔄 Restarting full authentication process...\n"
+                final_error_msg += f"🛡️ Critical security breach logged"
+                
+                self.gui.update_status("PASSCODE FAILED - RESTARTING AUTHENTICATION", 'orange')
+                self.gui.update_detail(final_error_msg, Colors.ERROR)
+                self.root.after(4000, self.start_authentication)
+
+    def _admin_authentication(self):
+        """Enhanced admin authentication via RFID với Discord alerts"""
+        # Discord notification về admin access attempt
+        if self.discord_bot:
+            threading.Thread(
+                target=self._send_discord_notification,
+                args=("🔧 **ADMIN RFID DETECTED**\nAdmin card scanned - requesting password authentication",),
+                daemon=True
+            ).start()
+        
+        # FORCE FOCUS BEFORE DIALOG
+        self.root.focus_force()
+        self.root.update()
+        
+        dialog = EnhancedNumpadDialog(
+            self.root, 
+            "🔧 ADMIN RFID ACCESS",
+            "Admin card detected. Enter admin password:", 
+            True, 
+            self.buzzer
+        )
+        
+        # FORCE FOCUS FOR DIALOG
         if hasattr(dialog, 'dialog'):
             dialog.dialog.focus_force()
             dialog.dialog.grab_set()
@@ -916,140 +1148,261 @@ class AIEnhancedSecuritySystem:
         password = dialog.show()
         
         if password == self.config.ADMIN_PASS:
-            logger.info("Admin RFID authentication successful")  # XÓA ICON ✅
+            # Admin authentication successful
+            if self.discord_bot:
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=(f"✅ **ADMIN ACCESS GRANTED**\nAdmin authenticated successfully via RFID + password\nOpening admin control panel...",),
+                    daemon=True
+                ).start()
+            
+            logger.info("✅ Admin RFID authentication successful")
             self.gui.update_status("ADMIN RFID VERIFIED! OPENING CONTROL PANEL", 'lightgreen')
-            self.gui.update_detail("Admin RFID authentication successful!\nOpening admin control panel...", Colors.SUCCESS)
+            self.gui.update_detail(
+                "🔧 ADMIN AUTHENTICATION SUCCESSFUL!\n"
+                "✅ Admin RFID card verified\n"
+                "✅ Admin password verified\n"
+                "🎛️ Opening admin control panel...", Colors.SUCCESS)
             self.buzzer.beep("success")
             self.admin_gui.show_admin_panel()
+            
         elif password is not None:
+            # Wrong admin password
+            if self.discord_bot:
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=("❌ **ADMIN ACCESS DENIED**\nCorrect admin RFID but incorrect password\n⚠️ Possible unauthorized access attempt",),
+                    daemon=True
+                ).start()
+            
+            logger.warning("❌ Admin RFID detected but wrong password")
             self.gui.update_status("ADMIN PASSWORD INCORRECT", 'orange')
-            self.gui.update_detail("Admin password incorrect!\nReturning to authentication...", Colors.ERROR)
+            self.gui.update_detail(
+                "❌ ADMIN ACCESS DENIED!\n"
+                "✅ Admin RFID verified\n"
+                "❌ Admin password incorrect\n"
+                "⚠️ Security violation logged\n"
+                "🔄 Returning to authentication...", Colors.ERROR)
             self.buzzer.beep("error")
-            time.sleep(2)
+            time.sleep(3)
             self.start_authentication()
         else:
+            # Admin cancelled
+            if self.discord_bot:
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=("🔄 **ADMIN ACCESS CANCELLED**\nAdmin cancelled password entry\nReturning to normal authentication",),
+                    daemon=True
+                ).start()
+            
+            logger.info("Admin access cancelled")
+            self.gui.update_detail("🔄 Admin access cancelled\nReturning to authentication...", Colors.WARNING)
             self.start_authentication()
     
-    def _proceed_to_passcode(self):
-        """Chuyển sang bước cuối - passcode"""
-        logger.info("Chuyển sang bước passcode cuối cùng")  # XÓA ICON 🔑
-        self.auth_state["step"] = AuthStep.PASSCODE
-        self.auth_state["pin_attempts"] = 0
+
+    def _send_discord_failure_alert(self, step, attempts, details=""):
+        """FIXED: Helper method để gửi Discord failure alert"""
+        def send_alert():
+            try:
+                if self.discord_bot and self.discord_bot.bot:
+                    # Tạo event loop mới
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    
+                    # Log để debug
+                    logger.info(f"Sending Discord alert: {step} - {attempts} attempts")
+                    
+                    # Gửi alert
+                    loop.run_until_complete(
+                        self.discord_bot.send_authentication_failure_alert(step, attempts, details)
+                    )
+                    loop.close()
+                    
+                    logger.info(f"Discord alert sent successfully: {step}")
+                    
+                else:
+                    logger.warning("Discord bot not available for alert")
+                    
+            except Exception as e:
+                logger.error(f"Discord alert error: {e}")
+                import traceback
+                traceback.print_exc()
         
-        # XÓA ICON
-        self.gui.update_step(4, "FINAL PASSCODE", "Enter system passcode", Colors.SUCCESS)
-        self.gui.update_status("ENTER FINAL PASSCODE...", 'lightgreen')
-        
-        self._request_passcode()
-    
-    def _request_passcode(self):
-        """Passcode input với retry logic - FIXED FOCUS"""
-        if self.auth_state["pin_attempts"] >= self.config.MAX_ATTEMPTS:
-            logger.warning("Passcode: Hết lượt thử")  # XÓA ICON ⚠️
-            self.gui.update_status("PASSCODE FAILED - RESTARTING", 'orange')
-            self.gui.update_detail("Maximum passcode attempts exceeded.\nRestarting authentication process...", Colors.ERROR)
-            self.buzzer.beep("error")
-            self.root.after(3000, self.start_authentication)
-            return
-        
-        self.auth_state["pin_attempts"] += 1
-        attempt_msg = f"Attempt {self.auth_state['pin_attempts']}/{self.config.MAX_ATTEMPTS}"
-        
-        # XÓA ICON
-        self.gui.update_step(4, "PASSCODE", attempt_msg, Colors.SUCCESS)
-        self.gui.update_detail(f"Enter system passcode... (Attempt {self.auth_state['pin_attempts']}/{self.config.MAX_ATTEMPTS})\nUse the numeric keypad to enter your code.", Colors.SUCCESS)
-        
-        # FORCE FOCUS TRƯỚC KHI MỞ DIALOG
-        self.root.focus_force()
-        self.root.update()
-        
-        dialog = EnhancedNumpadDialog(self.root, "FINAL AUTHENTICATION",  # XÓA ICON 🔑
-                                    "Enter system passcode to unlock:", True, self.buzzer)
-        
-        # FORCE FOCUS CHO DIALOG
-        if hasattr(dialog, 'dialog'):
-            dialog.dialog.focus_force()
-            dialog.dialog.grab_set()
-            dialog.dialog.lift()
-        
-        pin = dialog.show()
-        
-        if pin == self.admin_data.get_passcode():
-            logger.info("Passcode verified - Authentication complete!")  # XÓA ICON ✅
-            self.gui.update_status("AUTHENTICATION COMPLETE! UNLOCKING DOOR...", 'lightgreen')
-            self.gui.update_detail("All authentication steps completed successfully!\nDoor unlocking now...", Colors.SUCCESS)
-            self.buzzer.beep("success")
-            self._unlock_door()
-        elif pin is not None:
-            remaining = self.config.MAX_ATTEMPTS - self.auth_state["pin_attempts"]
-            if remaining > 0:
-                self.gui.update_detail(f"Incorrect passcode!\n{remaining} attempts remaining\nPlease try again.", Colors.ERROR)
-                self.buzzer.beep("error")
-                self.root.after(1500, self._request_passcode)
-            else:
-                self.gui.update_status("PASSCODE FAILED - RESTARTING", 'orange')
-                self.gui.update_detail("Maximum passcode attempts exceeded.\nRestarting authentication process...", Colors.ERROR)
-                self.buzzer.beep("error")
-                self.root.after(3000, self.start_authentication)
-        else:
-            self.start_authentication()
-    
-    def _unlock_door(self):
-        """Mở khóa cửa với countdown"""
+        # Chạy trong thread riêng
+        threading.Thread(target=send_alert, daemon=True).start()
+
+    def _send_discord_success(self, step, details=""):
+        """Enhanced helper function để gửi Discord success notification"""
         try:
-            logger.info(f"Unlocking door for {self.config.LOCK_OPEN_DURATION} seconds")
+            if self.discord_bot:
+                # Create event loop for this thread
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                
+                # Record the success
+                loop.run_until_complete(
+                    self.discord_bot.record_authentication_success(step)
+                )
+                
+                # Send additional success notification with details if provided
+                if details:
+                    success_message = f"✅ **{step.upper()} AUTHENTICATION SUCCESS**\n{details}"
+                    loop.run_until_complete(
+                        self.discord_bot.send_security_notification(success_message, "SUCCESS")
+                    )
+                
+                loop.close()
+                logger.info(f"Discord success notification sent for {step}")
+                
+        except Exception as e:
+            logger.error(f"Discord success notification error for {step}: {e}")
+
+    def _send_discord_notification(self, message):
+        """Enhanced helper function để gửi Discord notification từ sync context"""
+        try:
+            if self.discord_bot and self.discord_bot.bot:
+                # Create event loop for this thread
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                
+                # Send notification
+                loop.run_until_complete(
+                    self.discord_bot.send_security_notification(message, "INFO")
+                )
+                loop.close()
+                
+                logger.info(f"Discord notification sent: {message[:50]}...")
+                
+        except Exception as e:
+            logger.error(f"Discord notification error: {e}")
+
+    def _unlock_door(self):
+        """Enhanced door unlock với Discord notifications"""
+        try:
+            logger.info(f"🔓 Unlocking door for {self.config.LOCK_OPEN_DURATION} seconds")
+            
+            # Final Discord success notification
+            if self.discord_bot:
+                unlock_message = f"🔓 **DOOR UNLOCKED SUCCESSFULLY**\n"
+                unlock_message += f"🎉 4-layer authentication completed:\n"
+                unlock_message += f"  ✅ Face Recognition: PASSED\n"
+                unlock_message += f"  ✅ Fingerprint: PASSED\n"
+                unlock_message += f"  ✅ RFID Card: PASSED\n"
+                unlock_message += f"  ✅ Passcode: PASSED\n\n"
+                unlock_message += f"🕐 Door will auto-lock in {self.config.LOCK_OPEN_DURATION} seconds\n"
+                unlock_message += f"📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=(unlock_message,),
+                    daemon=True
+                ).start()
             
             self.gui.update_step(4, "COMPLETED", "DOOR UNLOCKED", Colors.SUCCESS)
             self.gui.update_status(f"DOOR OPEN - AUTO LOCK IN {self.config.LOCK_OPEN_DURATION}S", 'lightgreen')
             
+            # Unlock the door
             self.relay.off()  # Unlock door
             self.buzzer.beep("success")
             
-            # THÊM DISCORD NOTIFICATION
-            if self.discord_bot:
-                threading.Thread(
-                    target=self._send_discord_notification,
-                    args=("🔓 **CỬA ĐÃ MỞ** - 4-layer authentication completed successfully!",),
-                    daemon=True
-                ).start()
-            
-            # Countdown với hiệu ứng
+            # Countdown with visual effects
             for i in range(self.config.LOCK_OPEN_DURATION, 0, -1):
                 self.root.after((self.config.LOCK_OPEN_DURATION - i) * 1000, 
-                            lambda t=i: self.gui.update_detail(f"Door is open - Auto lock in {t} seconds\nPlease enter and close the door", Colors.SUCCESS))
+                            lambda t=i: self.gui.update_detail(
+                                f"🔓 DOOR IS OPEN\n"
+                                f"⏰ Auto lock in {t} seconds\n"
+                                f"🚶 Please enter and close the door\n"
+                                f"🛡️ All security systems active", Colors.SUCCESS))
                 self.root.after((self.config.LOCK_OPEN_DURATION - i) * 1000,
                             lambda t=i: self.gui.update_status(f"DOOR OPEN - LOCK IN {t}S", 'lightgreen'))
                 
+                # Beep countdown for last 3 seconds
                 if i <= 3:
                     self.root.after((self.config.LOCK_OPEN_DURATION - i) * 1000,
                                 lambda: self.buzzer.beep("click"))
             
+            # Schedule auto-lock
             self.root.after(self.config.LOCK_OPEN_DURATION * 1000, self._lock_door)
             
         except Exception as e:
             logger.error(f"Door unlock error: {e}")
-            self.gui.update_detail(f"Door unlock error: {str(e)}", Colors.ERROR)
-            self.buzzer.beep("error")
-    
-    def _lock_door(self):
-        """Khóa cửa và reset hệ thống"""
-        try:
-            logger.info("Locking door and resetting system")  # XÓA ICON 🔒
             
+            # Error notification to Discord
+            if self.discord_bot:
+                error_message = f"❌ **DOOR UNLOCK ERROR**\nHardware error during unlock: {str(e)}\n⚠️ Manual intervention may be required"
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=(error_message,),
+                    daemon=True
+                ).start()
+            
+            self.gui.update_detail(f"🔧 DOOR UNLOCK ERROR!\n{str(e)}\nPlease check hardware", Colors.ERROR)
+            self.buzzer.beep("error")
+
+    def _lock_door(self):
+        """Enhanced door lock với Discord notifications"""
+        try:
+            logger.info("🔒 Locking door and resetting system")
+            
+            # Lock the door
             self.relay.on()  # Lock door
+            
+            # Discord notification về auto-lock
+            if self.discord_bot:
+                lock_message = f"🔒 **DOOR AUTO-LOCKED**\n"
+                lock_message += f"✅ Door secured after {self.config.LOCK_OPEN_DURATION} seconds\n"
+                lock_message += f"🔄 System ready for next user\n"
+                lock_message += f"🛡️ All security layers reset\n"
+                lock_message += f"📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+                
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=(lock_message,),
+                    daemon=True
+                ).start()
+            
             self.gui.update_status("DOOR LOCKED - SYSTEM READY FOR NEXT USER", 'white')
-            self.gui.update_detail("Door has been locked automatically.\nSystem ready for next authentication cycle.", Colors.PRIMARY)
+            self.gui.update_detail(
+                "🔒 DOOR LOCKED AUTOMATICALLY\n"
+                "✅ Security system reset\n"
+                "🔄 Ready for next authentication cycle\n"
+                "🛡️ All sensors active and monitoring", Colors.PRIMARY)
             self.buzzer.beep("click")
             
             # Reset detection stats
             self.gui.detection_stats = {"total": 0, "recognized": 0, "unknown": 0}
             
-            self.root.after(2000, self.start_authentication)
+            # Reset authentication state completely
+            self.auth_state = {
+                "step": AuthStep.FACE,
+                "consecutive_face_ok": 0,
+                "fingerprint_attempts": 0,
+                "rfid_attempts": 0,
+                "pin_attempts": 0
+            }
+            
+            # Start new authentication cycle
+            self.root.after(3000, self.start_authentication)
             
         except Exception as e:
-            logger.error(f"Door lock error: {e}")  # XÓA ICON ❌
-            self.gui.update_detail(f"Door lock error: {str(e)}", Colors.ERROR)
+            logger.error(f"Door lock error: {e}")
+            
+            # Critical error notification to Discord
+            if self.discord_bot:
+                critical_message = f"🚨 **CRITICAL: DOOR LOCK ERROR**\n"
+                critical_message += f"❌ Failed to lock door: {str(e)}\n"
+                critical_message += f"⚠️ SECURITY BREACH RISK\n"
+                critical_message += f"🔧 IMMEDIATE MANUAL INTERVENTION REQUIRED"
+                
+                threading.Thread(
+                    target=self._send_discord_notification,
+                    args=(critical_message,),
+                    daemon=True
+                ).start()
+            
+            self.gui.update_detail(f"🚨 CRITICAL: DOOR LOCK ERROR!\n{str(e)}\n⚠️ Manual intervention required", Colors.ERROR)
             self.buzzer.beep("error")
+
     
     def run(self):
         """Chạy hệ thống chính"""
@@ -1124,6 +1477,8 @@ class AIEnhancedSecuritySystem:
             self.root.quit()
         
         logger.info("Cleanup completed")
+    
+    
 
 # ==== MAIN EXECUTION ====
 if __name__ == "__main__":
