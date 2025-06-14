@@ -152,6 +152,31 @@ logger = logging.getLogger(__name__)
 
 # ==== GIAO DIỆN TIẾNG VIỆT CHO SINH VIÊN ====
 class VietnameseSecurityGUI:
+    def update_fingerprint_status(self, status_type, message, details=""):
+        """Smart update cho fingerprint status"""
+        colors = {
+            "scanning": Colors.PRIMARY,
+            "quality_issue": Colors.WARNING, 
+            "not_recognized": Colors.ERROR,
+            "success": Colors.SUCCESS,
+            "timeout": Colors.WARNING,
+            "hardware_error": Colors.ERROR
+        }
+        
+        titles = {
+            "scanning": "ĐANG QUÉT VÂN TAY",
+            "quality_issue": "CHẤT LƯỢNG VÂN TAY", 
+            "not_recognized": "VÂN TAY KHÔNG NHẬN DIỆN",
+            "success": "VÂN TAY THÀNH CÔNG",
+            "timeout": "HẾT THỜI GIAN QUÉT",
+            "hardware_error": "LỖI PHẦN CỨNG"
+        }
+        
+        # Cập nhật step với màu sắc phù hợp
+        self.gui.update_step(2, titles.get(status_type, "QUÉT VÂN TAY"), message, colors.get(status_type, Colors.PRIMARY))
+        
+        if details:
+            self.gui.update_detail(details, colors.get(status_type, Colors.TEXT_SECONDARY))
     def __init__(self, root):
         self.root = root
         self.fps_counter = 0
@@ -740,7 +765,7 @@ class VietnameseSecuritySystem:
         threading.Thread(target=self._fingerprint_loop, daemon=True).start()
     
     def _fingerprint_loop(self):
-        """Vòng lặp xác thực vân tay"""
+        """FIXED: Fingerprint loop với smart error handling"""
         while (self.auth_state["fingerprint_attempts"] < self.config.MAX_ATTEMPTS and 
             self.auth_state["step"] == AuthStep.FINGERPRINT):
             
@@ -752,39 +777,84 @@ class VietnameseSecuritySystem:
                 
                 timeout = 10
                 start_time = time.time()
+                scan_success = False
+                image_read_attempts = 0  # ĐẾM SỐ LẦN ĐỌC ẢNH
                 
                 while time.time() - start_time < timeout:
-                    if self.fingerprint.readImage():
-                        self.fingerprint.convertImage(0x01)
-                        result = self.fingerprint.searchTemplate()
+                    try:
+                        if self.fingerprint.readImage():
+                            image_read_attempts += 1
+                            
+                            # SMART: Thử convert image
+                            try:
+                                self.fingerprint.convertImage(0x01)
+                                result = self.fingerprint.searchTemplate()
+                                
+                                if result[0] != -1:
+                                    # SUCCESS
+                                    logger.info(f"Fingerprint verified: ID {result[0]}")
+                                    self.buzzer.beep("success")
+                                    self.root.after(0, lambda: self.gui.update_status("VÂN TAY ĐÃ XÁC THỤC! CHUYỂN ĐẾN THẺ TỪ...", 'lightgreen'))
+                                    self.root.after(1500, self._proceed_to_rfid)
+                                    return
+                                else:
+                                    # Template not found - THẬT SỰ THẤT BẠI
+                                    logger.warning(f"Fingerprint not recognized: attempt {self.auth_state['fingerprint_attempts']}")
+                                    
+                                    # CHỈ GỬI DISCORD ALERT KHI THẬT SỰ THẤT BẠI
+                                    details = f"Template not found | Sensor reading: {result[1]} | Scanned successfully but not recognized"
+                                    self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
+                                    
+                                    self.buzzer.beep("error")
+                                    remaining = self.config.MAX_ATTEMPTS - self.auth_state["fingerprint_attempts"]
+                                    if remaining > 0:
+                                        self.root.after(0, lambda: self.gui.update_detail(
+                                            f"Vân tay không được nhận diện!\nCòn {remaining} lần thử\nVui lòng thử lại với ngón tay đã đăng ký.", Colors.ERROR))
+                                        time.sleep(2)
+                                        scan_success = True  # MARK AS SUCCESSFUL SCAN
+                                        break
+                                    
+                            except Exception as convert_error:
+                                # CONVERT ERROR - KHÔNG PHẢI LỖI THẬT SỰ
+                                error_msg = str(convert_error)
+                                
+                                # SMART: Phân biệt loại lỗi
+                                if "too few feature points" in error_msg.lower():
+                                    # LỖI NÀY THƯỜNG LÀ FALSE ALARM
+                                    logger.debug(f"Fingerprint quality issue (attempt {image_read_attempts}): {error_msg}")
+                                    
+                                    # NẾU ĐÃ THỬ NHIỀU LẦN MÀ VẪN LỖI NÀY -> SKIP
+                                    if image_read_attempts >= 3:
+                                        logger.info(f"Skipping quality error after {image_read_attempts} attempts")
+                                        continue
+                                    
+                                    # KHÔNG GỬI DISCORD ALERT CHO LOẠI LỖI NÀY
+                                    self.root.after(0, lambda: self.gui.update_detail(
+                                        f"Chất lượng vân tay chưa đủ tốt...\nVui lòng đặt ngón tay chắc chắn hơn.", Colors.WARNING))
+                                    time.sleep(0.5)
+                                    continue
+                                else:
+                                    # LỖI THẬT SỰ KHÁC
+                                    logger.error(f"Real fingerprint error: {error_msg}")
+                                    details = f"Hardware/processing error: {error_msg}"
+                                    self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
+                                    
+                                    self.root.after(0, lambda: self.gui.update_detail(f"Lỗi cảm biến: {error_msg}", Colors.ERROR))
+                                    time.sleep(1)
+                                    break
                         
-                        if result[0] != -1:
-                            # THÀNH CÔNG
-                            logger.info(f"Xác thực vân tay thành công: ID {result[0]}")
-                            self.buzzer.beep("success")
-                            self.root.after(0, lambda: self.gui.update_status("VÂN TAY ĐÃ XÁC THỰC! CHUYỂN ĐẾN THẺ RFID...", 'lightgreen'))
-                            self.root.after(1500, self._proceed_to_rfid)
-                            return
-                        else:
-                            # THẤT BẠI
-                            details = f"Không tìm thấy mẫu vân tay | Kết quả cảm biến: {result[1]}"
-                            logger.warning(f"Vân tay không được nhận diện: lần thử {self.auth_state['fingerprint_attempts']}")
-                            
-                            self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
-                            
-                            self.buzzer.beep("error")
-                            remaining = self.config.MAX_ATTEMPTS - self.auth_state["fingerprint_attempts"]
-                            if remaining > 0:
-                                self.root.after(0, lambda: self.gui.update_detail(
-                                    f"Vân tay không được nhận diện!\nCòn {remaining} lần thử\nVui lòng thử lại với ngón tay đã đăng ký.", Colors.ERROR))
-                                time.sleep(2)
-                                break
-                    time.sleep(0.1)
+                        time.sleep(0.1)
+                        
+                    except Exception as read_error:
+                        # LỖI ĐỌC SENSOR
+                        logger.error(f"Fingerprint read error: {read_error}")
+                        break
                 
-                if time.time() - start_time >= timeout:
-                    # HẾT THỜI GIAN
-                    details = f"Hết thời gian quét - không phát hiện ngón tay ({timeout}s)"
-                    logger.warning(f"Hết thời gian vân tay: lần thử {self.auth_state['fingerprint_attempts']}")
+                # CHECK TIMEOUT
+                if time.time() - start_time >= timeout and not scan_success:
+                    # TIMEOUT - GỬI DISCORD ALERT
+                    details = f"Scan timeout - no valid finger detected ({timeout}s) | Read attempts: {image_read_attempts}"
+                    logger.warning(f"Fingerprint timeout: attempt {self.auth_state['fingerprint_attempts']}")
                     
                     self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
                     
@@ -793,25 +863,25 @@ class VietnameseSecuritySystem:
                         self.root.after(0, lambda: self.gui.update_detail(
                             f"Hết thời gian quét!\nCòn {remaining} lần thử\nVui lòng đặt ngón tay đúng cách lên cảm biến.", Colors.WARNING))
                         time.sleep(1)
-                    
+                        
             except Exception as e:
-                # LỖI PHẦN CỨNG
-                details = f"Lỗi phần cứng: {str(e)}"
-                logger.error(f"Lỗi vân tay: {e}")
+                # LỖI TỔNG QUÁT
+                details = f"General hardware error: {str(e)}"
+                logger.error(f"Fingerprint general error: {e}")
                 
                 self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
                 
                 self.root.after(0, lambda: self.gui.update_detail(f"Lỗi cảm biến: {str(e)}", Colors.ERROR))
                 time.sleep(1)
         
-        # HẾT SỐ LẦN THỬ
+        # OUT OF ATTEMPTS
         if self.auth_state["fingerprint_attempts"] >= self.config.MAX_ATTEMPTS:
-            details = f"Đã vượt quá số lần thử vân tay tối đa ({self.config.MAX_ATTEMPTS})"
-            logger.critical(f"Vân tay vượt quá số lần thử: {self.auth_state['fingerprint_attempts']}")
+            details = f"Maximum fingerprint attempts exceeded ({self.config.MAX_ATTEMPTS}) | Real failures only"
+            logger.critical(f"Fingerprint max attempts exceeded: {self.auth_state['fingerprint_attempts']}")
             
             self._send_discord_failure_alert("fingerprint", self.auth_state['fingerprint_attempts'], details)
         
-        logger.warning("Vân tay: Đã vượt quá số lần thử tối đa")
+        logger.warning("Fingerprint: Maximum attempts exceeded")
         self.root.after(0, lambda: self.gui.update_status("VÂN TAY THẤT BẠI - KHỞI ĐỘNG LẠI XÁC THỰC", 'orange'))
         self.buzzer.beep("error")
         self.root.after(3000, self.start_authentication)
@@ -1170,32 +1240,19 @@ class VietnameseSecuritySystem:
     
 
     def _send_discord_failure_alert(self, step, attempts, details=""):
-        """Helper method để gửi Discord failure alert"""
+        """ULTRA SIMPLE: Gửi Discord alert không có timeout context"""
         def send_alert():
             try:
                 if self.discord_bot and self.discord_bot.bot:
-                    # Tạo event loop mới
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
-                    
-                    # Log để debug
-                    logger.info(f"Đang gửi cảnh báo Discord: {step} - {attempts} lần thử")
-                    
-                    # Gửi alert
-                    loop.run_until_complete(
+                    # SIMPLE: Chỉ dùng asyncio.run() 
+                    asyncio.run(
                         self.discord_bot.send_authentication_failure_alert(step, attempts, details)
                     )
-                    loop.close()
-                    
-                    logger.info(f"Cảnh báo Discord đã gửi thành công: {step}")
-                    
+                    logger.info(f"✅ Discord alert sent successfully: {step}")
                 else:
-                    logger.warning("Discord bot không khả dụng cho cảnh báo")
-                    
+                    logger.warning("Discord bot not available")
             except Exception as e:
-                logger.error(f"Lỗi cảnh báo Discord: {e}")
-                import traceback
-                traceback.print_exc()
+                logger.error(f"Discord alert error: {e}")
         
         # Chạy trong thread riêng
         threading.Thread(target=send_alert, daemon=True).start()
