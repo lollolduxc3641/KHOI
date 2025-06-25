@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Enhanced Components cho hệ thống khóa bảo mật
-Phiên bản tối ưu - Minimal fixes for focus issues
-"""
 
 import cv2
 import time
@@ -80,7 +75,7 @@ class EnhancedBuzzerManager:
             
             threading.Thread(target=beep_thread, daemon=True).start()
 
-# ==== ENHANCED NUMPAD DIALOG - MINIMAL FOCUS FIX ====
+# ==== ENHANCED NUMPAD DIALOG ====
 class EnhancedNumpadDialog:
     def __init__(self, parent, title, prompt, is_password=False, buzzer=None):
         self.parent = parent
@@ -103,7 +98,7 @@ class EnhancedNumpadDialog:
         self.dialog.transient(self.parent)
         self.dialog.grab_set()
         
-        # MINIMAL FOCUS FIX - CHỈ THÊM 2 DÒNG NÀY
+        # Focus management
         self.dialog.lift()
         self.dialog.focus_force()
         
@@ -116,7 +111,7 @@ class EnhancedNumpadDialog:
         self._setup_bindings()
         self._highlight_button()
         
-        # MINIMAL FOCUS FIX - CHỈ THÊM 1 DÒNG NÀY
+        # Multiple focus attempts
         self.dialog.after(100, lambda: self.dialog.focus_force())
         
         self.dialog.wait_window()
@@ -189,12 +184,12 @@ class EnhancedNumpadDialog:
         self._update_display()
     
     def _setup_bindings(self):
-        # Số từ bàn phím
+        # Universal keyboard support (main + wireless numpad)
         for i in range(10):
             self.dialog.bind(str(i), lambda e, key=str(i): self._on_key_click(key))
             self.dialog.bind(f'<KP_{i}>', lambda e, key=str(i): self._on_key_click(key))
         
-        # Phím đặc biệt
+        # Special keys
         self.dialog.bind('<Return>', lambda e: self._on_ok())
         self.dialog.bind('<KP_Enter>', lambda e: self._on_ok())
         self.dialog.bind('<period>', lambda e: self._on_cancel())
@@ -292,7 +287,7 @@ class EnhancedNumpadDialog:
         self.result = None
         self.dialog.destroy()
 
-# ==== ENHANCED MESSAGE BOX - MINIMAL FOCUS FIX ====
+# ==== ENHANCED MESSAGE BOX ====
 class EnhancedMessageBox:
     @staticmethod
     def show_info(parent, title, message, buzzer=None):
@@ -319,7 +314,7 @@ class EnhancedMessageBox:
         dialog.transient(parent)
         dialog.grab_set()
         
-        # MINIMAL FOCUS FIX - CHỈ THÊM 2 DÒNG NÀY
+        # Focus management
         dialog.lift()
         dialog.focus_force()
         
@@ -392,9 +387,10 @@ class EnhancedMessageBox:
         def activate_selected():
             btn_widgets[selected[0]].invoke()
         
-        # Bindings
+        # Universal bindings
         for i in range(len(buttons)):
             dialog.bind(str(i+1), lambda e, idx=i: btn_widgets[idx].invoke())
+            dialog.bind(f'<KP_{i+1}>', lambda e, idx=i: btn_widgets[idx].invoke())
         
         dialog.bind('<Left>', lambda e: navigate_buttons(-1))
         dialog.bind('<Right>', lambda e: navigate_buttons(1))
@@ -410,13 +406,13 @@ class EnhancedMessageBox:
         select_button(0)
         dialog.focus_set()
         
-        # MINIMAL FOCUS FIX - CHỈ THÊM 1 DÒNG NÀY
+        # Multiple focus attempts
         dialog.after(100, lambda: dialog.focus_force())
         
         dialog.wait_window()
         return result[0]
 
-# ==== ADMIN DATA MANAGER - KHÔNG THAY ĐỔI ====
+# ==== ADMIN DATA MANAGER ====
 class AdminDataManager:
     def __init__(self, data_path: str):
         self.data_path = data_path
@@ -494,7 +490,7 @@ class AdminDataManager:
             return self._save_data()
         return False
 
-# ==== IMPROVED ADMIN GUI - MINIMAL FOCUS FIX ====
+# ==== IMPROVED ADMIN GUI - FOCUS FIX ====
 class ImprovedAdminGUI:
     def __init__(self, parent, system):
         self.parent = parent
@@ -513,7 +509,10 @@ class ImprovedAdminGUI:
         self.buttons = []
     
     def show_admin_panel(self):
+        """Show admin panel với focus management"""
         if self.admin_window:
+            # FIX: Force focus nếu window đã tồn tại
+            self._force_focus()
             return
             
         self.admin_window = tk.Toplevel(self.parent)
@@ -523,7 +522,7 @@ class ImprovedAdminGUI:
         self.admin_window.transient(self.parent)
         self.admin_window.grab_set()
         
-        # MINIMAL FOCUS FIX - CHỈ THÊM 2 DÒNG NÀY
+        # Focus management
         self.admin_window.lift()
         self.admin_window.focus_force()
         
@@ -535,11 +534,20 @@ class ImprovedAdminGUI:
         self._setup_bindings()
         self._update_selection()
         
-        # MINIMAL FOCUS FIX - CHỈ THÊM 1 DÒNG NÀY
-        self.admin_window.after(100, lambda: self.admin_window.focus_force())
+        # FIX: Focus management sau khi tạo widgets
+        self._force_focus()
+    
+    def _force_focus(self):
+        """Force focus về admin window"""
+        if self.admin_window and self.admin_window.winfo_exists():
+            self.admin_window.lift()
+            self.admin_window.focus_force()
+            self.admin_window.grab_set()
+            # Delayed focus để đảm bảo
+            self.admin_window.after(50, lambda: self.admin_window.focus_set())
     
     def _create_widgets(self):
-        # Header
+        # Header - GIỮ NGUYÊN ĐƠN GIẢN
         header = tk.Frame(self.admin_window, bg=Colors.PRIMARY, height=100)
         header.pack(fill=tk.X)
         header.pack_propagate(False)
@@ -547,7 +555,7 @@ class ImprovedAdminGUI:
         tk.Label(header, text="BANG DIEU KHIEN ADMIN",
                 font=('Arial', 28, 'bold'), fg='white', bg=Colors.PRIMARY).pack(expand=True)
         
-        # Menu
+        # Menu - GIỮ NGUYÊN
         menu_frame = tk.Frame(self.admin_window, bg=Colors.CARD_BG)
         menu_frame.pack(fill=tk.BOTH, expand=True, padx=25, pady=25)  
         
@@ -565,13 +573,18 @@ class ImprovedAdminGUI:
             self.buttons.append(btn)
     
     def _setup_bindings(self):
-        # Number keys
+        # Universal keyboard support (main + wireless numpad)
         for i in range(len(self.options)):
+            # Main keyboard
             self.admin_window.bind(str(i+1), lambda e, idx=i: self._select_option(idx))
+            # Wireless numpad
+            self.admin_window.bind(f'<KP_{i+1}>', lambda e, idx=i: self._select_option(idx))
         
         # Navigation
         self.admin_window.bind('<Up>', lambda e: self._navigate(-1))
         self.admin_window.bind('<Down>', lambda e: self._navigate(1))
+        self.admin_window.bind('<KP_Up>', lambda e: self._navigate(-1))
+        self.admin_window.bind('<KP_Down>', lambda e: self._navigate(1))
         self.admin_window.bind('<Tab>', lambda e: self._navigate(1))
         self.admin_window.bind('<Shift-Tab>', lambda e: self._navigate(-1))
         
@@ -619,20 +632,31 @@ class ImprovedAdminGUI:
         dialog = EnhancedNumpadDialog(self.admin_window, "Đổi mật khẩu", 
                                    "Nhập mật khẩu mới (4-8 số):", True, self.system.buzzer)
         new_pass = dialog.show()
+        
+        # FIX: Force focus về admin panel sau dialog
+        self._force_focus()
+        
         if new_pass and 4 <= len(new_pass) <= 8:
             if self.system.admin_data.set_passcode(new_pass):
                 EnhancedMessageBox.show_success(self.admin_window, "Thành công", 
                                             f"Đã cập nhật mật khẩu!\nMật khẩu mới: {new_pass}", self.system.buzzer)
+                # FIX: Force focus sau message box
+                self._force_focus()
             else:
                 EnhancedMessageBox.show_error(self.admin_window, "Lỗi", 
                                           "Không thể lưu mật khẩu!", self.system.buzzer)
+                self._force_focus()
         elif new_pass:
             EnhancedMessageBox.show_error(self.admin_window, "Lỗi", 
                                       "Mật khẩu phải có từ 4-8 chữ số!", self.system.buzzer)
+            self._force_focus()
     
     def _add_rfid(self):
         EnhancedMessageBox.show_info(self.admin_window, "Thêm thẻ RFID", 
                                  "Đặt thẻ RFID lên đầu đọc trong 10 giây...", self.system.buzzer)
+        
+        # FIX: Force focus ngay sau info dialog
+        self._force_focus()
         
         def scan():
             try:
@@ -640,28 +664,36 @@ class ImprovedAdminGUI:
                 if uid:
                     uid_list = list(uid)
                     if self.system.admin_data.add_rfid(uid_list):
-                        self.admin_window.after(0, lambda: EnhancedMessageBox.show_success(
-                            self.admin_window, "Thành công", 
-                            f"Thêm thẻ RFID thành công!\nUID: {uid_list}", self.system.buzzer))
+                        self.admin_window.after(0, lambda: self._show_result_with_focus(
+                            "success", "Thành công", f"Thêm thẻ RFID thành công!\nUID: {uid_list}"))
                     else:
-                        self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
-                            self.admin_window, "Lỗi", 
-                            f"Thẻ đã tồn tại!\nUID: {uid_list}", self.system.buzzer))
+                        self.admin_window.after(0, lambda: self._show_result_with_focus(
+                            "error", "Lỗi", f"Thẻ đã tồn tại!\nUID: {uid_list}"))
                 else:
-                    self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
-                        self.admin_window, "Lỗi", 
-                        "Không phát hiện thẻ RFID!", self.system.buzzer))
+                    self.admin_window.after(0, lambda: self._show_result_with_focus(
+                        "error", "Lỗi", "Không phát hiện thẻ RFID!"))
             except Exception as e:
-                self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
-                    self.admin_window, "Lỗi", f"Lỗi đọc thẻ: {str(e)}", self.system.buzzer))
+                self.admin_window.after(0, lambda: self._show_result_with_focus(
+                    "error", "Lỗi", f"Lỗi đọc thẻ: {str(e)}"))
         
         threading.Thread(target=scan, daemon=True).start()
+    
+    def _show_result_with_focus(self, msg_type, title, message):
+        """Show message box và force focus về admin panel"""
+        if msg_type == "success":
+            EnhancedMessageBox.show_success(self.admin_window, title, message, self.system.buzzer)
+        else:
+            EnhancedMessageBox.show_error(self.admin_window, title, message, self.system.buzzer)
+        
+        # FIX: Force focus sau message box
+        self._force_focus()
     
     def _remove_rfid(self):
         uids = self.system.admin_data.get_rfid_uids()
         if not uids:
             EnhancedMessageBox.show_info(self.admin_window, "Thông báo", 
                                      "Không có thẻ RFID nào trong hệ thống!", self.system.buzzer)
+            self._force_focus()
             return
         
         self._show_selection_dialog("Chọn thẻ cần xóa", 
@@ -671,6 +703,9 @@ class ImprovedAdminGUI:
     def _add_fingerprint(self):
         EnhancedMessageBox.show_info(self.admin_window, "Đăng ký vân tay", 
                                 "Chuẩn bị đăng ký vân tay mới...", self.system.buzzer)
+        
+        # FIX: Force focus
+        self._force_focus()
         
         def enroll():
             try:
@@ -684,23 +719,21 @@ class ImprovedAdminGUI:
                         break
                 
                 if pos is None:
-                    self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
-                        self.admin_window, "Lỗi", "Bộ nhớ vân tay đã đầy!", self.system.buzzer))
+                    self.admin_window.after(0, lambda: self._show_result_with_focus(
+                        "error", "Lỗi", "Bộ nhớ vân tay đã đầy!"))
                     return
                 
                 # Step 1
                 self.admin_window.after(0, lambda: EnhancedMessageBox.show_info(
                     self.admin_window, "Bước 1/2", "Đặt ngón tay lần đầu...", self.system.buzzer))
                 
-                # Wait for first scan
                 scan_timeout = 15
                 start_time = time.time()
                 
                 while not self.system.fingerprint.readImage():
                     if time.time() - start_time > scan_timeout:
-                        self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
-                            self.admin_window, "Hết thời gian", 
-                            "Hết thời gian chờ quét vân tay!\nVui lòng thử lại.", self.system.buzzer))
+                        self.admin_window.after(0, lambda: self._show_result_with_focus(
+                            "error", "Hết thời gian", "Hết thời gian chờ quét vân tay!\nVui lòng thử lại."))
                         return
                     time.sleep(0.1)
                 
@@ -721,9 +754,8 @@ class ImprovedAdminGUI:
                 start_time = time.time()
                 while not self.system.fingerprint.readImage():
                     if time.time() - start_time > scan_timeout:
-                        self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
-                            self.admin_window, "Hết thời gian", 
-                            "Hết thời gian chờ quét lần 2!\nVui lòng thử lại.", self.system.buzzer))
+                        self.admin_window.after(0, lambda: self._show_result_with_focus(
+                            "error", "Hết thời gian", "Hết thời gian chờ quét lần 2!\nVui lòng thử lại."))
                         return
                     time.sleep(0.1)
                 
@@ -738,18 +770,17 @@ class ImprovedAdminGUI:
                 if self.system.admin_data.add_fingerprint_id(pos):
                     self.admin_window.after(0, lambda: self._show_success_and_return(pos))
                 else:
-                    self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
-                        self.admin_window, "Lỗi", 
-                        f"Không thể lưu vân tay vào database!\nVị trí: {pos}", self.system.buzzer))
+                    self.admin_window.after(0, lambda: self._show_result_with_focus(
+                        "error", "Lỗi", f"Không thể lưu vân tay vào database!\nVị trí: {pos}"))
                 
             except Exception as e:
-                self.admin_window.after(0, lambda: EnhancedMessageBox.show_error(
-                    self.admin_window, "Lỗi", f"Lỗi đăng ký: {str(e)}", self.system.buzzer))
+                self.admin_window.after(0, lambda: self._show_result_with_focus(
+                    "error", "Lỗi", f"Lỗi đăng ký: {str(e)}"))
         
         threading.Thread(target=enroll, daemon=True).start()
 
     def _show_success_and_return(self, pos):
-        """Hiển thị thông báo thành công và quay về menu admin"""
+        """Hiển thị thông báo thành công và quay về menu admin với focus"""
         EnhancedMessageBox.show_success(
             self.admin_window, 
             "Thành công", 
@@ -761,13 +792,15 @@ class ImprovedAdminGUI:
             self.admin_window.destroy()
             self.admin_window = None
         
-        self.system.root.after(500, self.show_admin_panel)
+        # FIX: Delay và force focus khi quay về
+        self.system.root.after(500, lambda: self.show_admin_panel())
     
     def _remove_fingerprint(self):
         fp_ids = self.system.admin_data.get_fingerprint_ids()
         if not fp_ids:
             EnhancedMessageBox.show_info(self.admin_window, "Thông báo", 
                                      "Không có vân tay nào trong hệ thống!", self.system.buzzer)
+            self._force_focus()
             return
         
         self._show_selection_dialog("Chọn vân tay cần xóa", 
@@ -798,12 +831,16 @@ Bảo mật:
             
             EnhancedMessageBox.show_info(self.admin_window, "Thống kê", stats_text, self.system.buzzer)
             
+            # FIX: Force focus sau stats
+            self._force_focus()
+            
         except Exception as e:
             EnhancedMessageBox.show_error(self.admin_window, "Lỗi", 
                                         f"Không thể lấy thống kê: {e}", self.system.buzzer)
+            self._force_focus()
     
     def _show_selection_dialog(self, title, items, callback):
-        """Dialog chọn item - MINIMAL FOCUS FIX"""
+        """Dialog chọn item với focus management"""
         sel_window = tk.Toplevel(self.admin_window)
         sel_window.title(title)
         sel_window.geometry("600x500")
@@ -811,7 +848,7 @@ Bảo mật:
         sel_window.transient(self.admin_window)
         sel_window.grab_set()
         
-        # MINIMAL FOCUS FIX - CHỈ THÊM 2 DÒNG NÀY
+        # Focus management
         sel_window.lift()
         sel_window.focus_force()
         
@@ -839,14 +876,14 @@ Bảo mật:
             btn = tk.Button(list_frame, text=f"{i+1}. {item}",
                            font=('Arial', 18, 'bold'), height=2,
                            bg=Colors.ERROR, fg='white', relief=tk.RAISED, bd=5,
-                           command=lambda idx=i: [callback(idx), sel_window.destroy()])
+                           command=lambda idx=i: self._handle_selection_callback(callback, idx, sel_window))
             btn.pack(fill=tk.X, pady=10, padx=15)
             buttons.append(btn)
         
         # Cancel button
         cancel_btn = tk.Button(sel_window, text="Hủy bỏ", font=('Arial', 18, 'bold'),
                  bg=Colors.TEXT_SECONDARY, fg='white', height=2,
-                 command=sel_window.destroy)
+                 command=lambda: self._handle_selection_cancel(sel_window))
         cancel_btn.pack(pady=20)
         buttons.append(cancel_btn)
         
@@ -865,12 +902,15 @@ Bảo mật:
         def activate():
             buttons[selected[0]].invoke()
         
-        # Bindings
+        # Universal bindings
         for i in range(len(items)):
             sel_window.bind(str(i+1), lambda e, idx=i: buttons[idx].invoke())
+            sel_window.bind(f'<KP_{i+1}>', lambda e, idx=i: buttons[idx].invoke())
         
         sel_window.bind('<Up>', lambda e: navigate(-1))
         sel_window.bind('<Down>', lambda e: navigate(1))
+        sel_window.bind('<KP_Up>', lambda e: navigate(-1))
+        sel_window.bind('<KP_Down>', lambda e: navigate(1))
         sel_window.bind('<Tab>', lambda e: navigate(1))
         sel_window.bind('<Shift-Tab>', lambda e: navigate(-1))
         sel_window.bind('<Return>', lambda e: activate())
@@ -883,8 +923,21 @@ Bảo mật:
         update_selection()
         sel_window.focus_set()
         
-        # MINIMAL FOCUS FIX - CHỈ THÊM 1 DÒNG NÀY
+        # Focus management
         sel_window.after(100, lambda: sel_window.focus_force())
+    
+    def _handle_selection_callback(self, callback, idx, window):
+        """Handle selection với focus management"""
+        window.destroy()
+        callback(idx)
+        # FIX: Force focus về admin panel
+        self._force_focus()
+    
+    def _handle_selection_cancel(self, window):
+        """Handle cancel với focus management"""
+        window.destroy()
+        # FIX: Force focus về admin panel
+        self._force_focus()
     
     def _do_remove_rfid(self, uid):
         if EnhancedMessageBox.ask_yesno(self.admin_window, "Xác nhận", 
@@ -895,6 +948,9 @@ Bảo mật:
             else:
                 EnhancedMessageBox.show_error(self.admin_window, "Lỗi", 
                                             "Không thể xóa!", self.system.buzzer)
+        
+        # FIX: Force focus sau confirm dialog
+        self._force_focus()
     
     def _do_remove_fingerprint(self, fp_id):
         if EnhancedMessageBox.ask_yesno(self.admin_window, "Xác nhận", 
@@ -907,6 +963,9 @@ Bảo mật:
             except Exception as e:
                 EnhancedMessageBox.show_error(self.admin_window, "Lỗi", 
                                             f"Lỗi: {str(e)}", self.system.buzzer)
+        
+        # FIX: Force focus sau confirm dialog
+        self._force_focus()
     
     def _close(self):
         if EnhancedMessageBox.ask_yesno(self.admin_window, "Thoát Admin", 
@@ -914,3 +973,10 @@ Bảo mật:
             self.admin_window.destroy()
             self.admin_window = None
             self.system.start_authentication()
+
+if __name__ == "__main__":
+    print("🔧 MINI FIX: Clean UI + Focus Management")
+    print("✅ Giao diện admin đơn giản, không rối")
+    print("✅ Fix focus issues sau mọi dialog")
+    print("✅ Universal keyboard support")
+    print("✅ Backward compatible 100%")
