@@ -57,7 +57,7 @@ class ThreadSafeFingerprintManager:
         self._current_user = None
         self._acquired_time = None
         
-        logger.info("✅ ThreadSafeFingerprintManager initialized")
+        logger.info("  ThreadSafeFingerprintManager initialized")
     
     def acquire_sensor(self, user_id: str, timeout: float = 10.0):
         """Acquire exclusive access to fingerprint sensor"""
@@ -71,7 +71,7 @@ class ThreadSafeFingerprintManager:
                     self._in_use = True
                     self._current_user = user_id
                     self._acquired_time = time.time()
-                    logger.info(f"✅ Fingerprint sensor acquired by {user_id}")
+                    logger.info(f"  Fingerprint sensor acquired by {user_id}")
                     return True
                 else:
                     logger.debug(f"⏳ Sensor busy, current user: {self._current_user}")
@@ -123,10 +123,10 @@ class EnhancedBuzzerManager:
             if HARDWARE_AVAILABLE:
                 self.buzzer = PWMOutputDevice(gpio_pin)
                 self.buzzer.off()
-                logger.info(f"✅ Buzzer khởi tạo thành công trên GPIO {gpio_pin}")
+                logger.info(f"  Buzzer khởi tạo thành công trên GPIO {gpio_pin}")
             else:
                 self.buzzer = None
-                logger.info(f"🔧 Buzzer simulation mode (GPIO {gpio_pin})")
+                logger.info(f"  Buzzer simulation mode (GPIO {gpio_pin})")
         except Exception as e:
             logger.error(f"❌ Lỗi khởi tạo buzzer: {e}")
             self.buzzer = None
@@ -195,7 +195,7 @@ class EnhancedNumpadDialog:
         self.dialog.transient(self.parent)
         self.dialog.grab_set()
         
-        # 🔧 ENHANCED FOCUS MANAGEMENT
+        #   ENHANCED FOCUS MANAGEMENT
         self.dialog.lift()
         self.dialog.focus_force()
         self.dialog.attributes('-topmost', True)
@@ -210,7 +210,7 @@ class EnhancedNumpadDialog:
         self._setup_bindings()
         self._highlight_button()
         
-        # 🔧 MULTIPLE FOCUS ATTEMPTS WITH DELAYS
+        #   MULTIPLE FOCUS ATTEMPTS WITH DELAYS
         self.dialog.after(50, self._ensure_focus)
         self.dialog.after(150, self._ensure_focus)
         self.dialog.after(300, self._ensure_focus)
@@ -219,7 +219,7 @@ class EnhancedNumpadDialog:
         return self.result
     
     def _ensure_focus(self):
-        """🔧 ENSURE FOCUS: Multiple attempts to maintain focus"""
+        """  ENSURE FOCUS: Multiple attempts to maintain focus"""
         try:
             if self.dialog and self.dialog.winfo_exists():
                 self.dialog.lift()
@@ -405,7 +405,7 @@ class EnhancedNumpadDialog:
             
             self.result = self.input_text
             
-            # 🔧 BEFORE DESTROY: Restore focus to parent
+            #   BEFORE DESTROY: Restore focus to parent
             if self.parent:
                 self.parent.after(50, lambda: self._restore_parent_focus())
             
@@ -421,14 +421,14 @@ class EnhancedNumpadDialog:
         
         self.result = None
         
-        # 🔧 BEFORE DESTROY: Restore focus to parent
+        #   BEFORE DESTROY: Restore focus to parent
         if self.parent:
             self.parent.after(50, lambda: self._restore_parent_focus())
         
         self.dialog.destroy()
     
     def _restore_parent_focus(self):
-        """🔧 RESTORE: Restore focus to parent window"""
+        """  RESTORE: Restore focus to parent window"""
         try:
             if self.parent and hasattr(self.parent, 'winfo_exists') and self.parent.winfo_exists():
                 self.parent.lift()
@@ -475,7 +475,7 @@ class EnhancedMessageBox:
         dialog.transient(parent)
         dialog.grab_set()
         
-        # 🔧 ENHANCED FOCUS MANAGEMENT
+        #   ENHANCED FOCUS MANAGEMENT
         dialog.lift()
         dialog.focus_force()
         dialog.attributes('-topmost', True)
@@ -527,7 +527,7 @@ class EnhancedMessageBox:
                 buzzer.beep("click")
             result[0] = text
             
-            # 🔧 ENHANCED PARENT FOCUS RESTORATION
+            #   ENHANCED PARENT FOCUS RESTORATION
             def restore_parent_focus_enhanced():
                 try:
                     if parent and hasattr(parent, 'winfo_exists') and parent.winfo_exists():
@@ -542,7 +542,7 @@ class EnhancedMessageBox:
                         # Remove topmost after focusing
                         parent.after(100, lambda: parent.attributes('-topmost', False))
                         
-                        logger.debug("🔧 Enhanced parent focus restored")
+                        logger.debug("  Enhanced parent focus restored")
                 except Exception as e:
                     logger.debug(f"Parent focus restoration error: {e}")
             
@@ -555,7 +555,7 @@ class EnhancedMessageBox:
             dialog.destroy()
         
         def restore_parent_focus():
-            """🔧 RESTORE: Focus to parent after dialog closes"""
+            """  RESTORE: Focus to parent after dialog closes"""
             try:
                 if parent and hasattr(parent, 'winfo_exists') and parent.winfo_exists():
                     parent.lift()
@@ -610,7 +610,7 @@ class EnhancedMessageBox:
         
         select_button(0)
         
-        # 🔧 MULTIPLE FOCUS ATTEMPTS
+        #   MULTIPLE FOCUS ATTEMPTS
         dialog.focus_set()
         dialog.after(50, lambda: dialog.focus_force())
         dialog.after(150, lambda: dialog.focus_set())
@@ -625,7 +625,7 @@ class AdminDataManager:
         self.data_path = data_path
         self.admin_file = os.path.join(data_path, "admin_data.json")
         self.data = self._load_data()
-        logger.info(f"✅ AdminDataManager khởi tạo - Mode: {self.get_authentication_mode()}")
+        logger.info(f"  AdminDataManager khởi tạo - Mode: {self.get_authentication_mode()}")
     
     def _load_data(self):
         default_data = {
@@ -726,7 +726,7 @@ class AdminDataManager:
         
         success = self._save_data()
         if success:
-            logger.info(f"✅ Authentication mode changed: {old_mode} → {mode}")
+            logger.info(f"  Authentication mode changed: {old_mode} → {mode}")
         else:
             logger.error(f"❌ Failed to save authentication mode change")
         
@@ -774,7 +774,7 @@ class ThreadSafeEnrollmentDialog:
         self.dialog.transient(self.parent)
         self.dialog.grab_set()
         
-        # 🔧 ENHANCED FOCUS MANAGEMENT
+        #   ENHANCED FOCUS MANAGEMENT
         self.dialog.lift()
         self.dialog.focus_force()
         self.dialog.attributes('-topmost', True)
@@ -790,13 +790,13 @@ class ThreadSafeEnrollmentDialog:
         # Protocol handler
         self.dialog.protocol("WM_DELETE_WINDOW", self._on_cancel)
         
-        # 🔧 MULTIPLE FOCUS ATTEMPTS
+        #   MULTIPLE FOCUS ATTEMPTS
         self.dialog.after(50, self._ensure_focus)
         self.dialog.after(150, self._ensure_focus)
         self.dialog.after(300, self._ensure_focus)
     
     def _ensure_focus(self):
-        """🔧 ENSURE FOCUS: Keep dialog focused"""
+        """  ENSURE FOCUS: Keep dialog focused"""
         try:
             if self.dialog and self.dialog.winfo_exists() and not self.cancelled:
                 self.dialog.lift()
@@ -861,7 +861,7 @@ class ThreadSafeEnrollmentDialog:
                     elif "LỖI" in status:
                         self.speaker.speak("error")
                 
-                # 🔧 MAINTAIN FOCUS DURING UPDATES
+                #   MAINTAIN FOCUS DURING UPDATES
                 self._ensure_focus()
         except:
             pass
@@ -897,7 +897,7 @@ class ThreadSafeEnrollmentDialog:
             
         self.cancelled = True
         
-        # 🔧 BEFORE DESTROY: Restore focus to parent
+        #   BEFORE DESTROY: Restore focus to parent
         if self.parent:
             self.parent.after(50, lambda: self._restore_parent_focus())
         
@@ -908,7 +908,7 @@ class ThreadSafeEnrollmentDialog:
             pass
     
     def close(self):
-        # 🔧 BEFORE DESTROY: Restore focus to parent
+        #   BEFORE DESTROY: Restore focus to parent
         if self.parent:
             self.parent.after(50, lambda: self._restore_parent_focus())
         
@@ -919,7 +919,7 @@ class ThreadSafeEnrollmentDialog:
             pass
     
     def _restore_parent_focus(self):
-        """🔧 RESTORE: Focus back to parent window"""
+        """  RESTORE: Focus back to parent window"""
         try:
             if self.parent and hasattr(self.parent, 'winfo_exists') and self.parent.winfo_exists():
                 self.parent.lift()
@@ -953,7 +953,7 @@ class ImprovedAdminGUI:
         ]
         self.buttons = []
         
-        logger.info("✅ ImprovedAdminGUI v2.9.1 - Focus Fixed + Simplified")
+        logger.info("  ImprovedAdminGUI - Focus Fixed + Simplified")
     
     def show_admin_panel(self):
         """Enhanced admin panel với better focus management"""
@@ -966,14 +966,14 @@ class ImprovedAdminGUI:
             return
             
         self.admin_window = tk.Toplevel(self.parent)
-        self.admin_window.title("QUẢN TRỊ HỆ THỐNG v2.9.1")  # 🎨 SIMPLIFIED TITLE
+        self.admin_window.title("QUẢN TRỊ HỆ THỐNG")  # 🎨 SIMPLIFIED TITLE
         
         self.admin_window.geometry("950x700")
         self.admin_window.configure(bg=Colors.DARK_BG)
         self.admin_window.transient(self.parent)
         self.admin_window.grab_set()
         
-        # 🔧 ENHANCED FOCUS MANAGEMENT
+        #   ENHANCED FOCUS MANAGEMENT
         self.admin_window.lift()
         self.admin_window.focus_force()
         self.admin_window.attributes('-topmost', True)
@@ -988,14 +988,14 @@ class ImprovedAdminGUI:
         self._setup_bindings()
         self._update_selection()
         
-        # 🔧 MULTIPLE FOCUS ATTEMPTS
+        #   MULTIPLE FOCUS ATTEMPTS
         self._safe_focus_admin()
         self.admin_window.after(100, self._safe_focus_admin)
         self.admin_window.after(250, self._safe_focus_admin)
         
         self._start_enhanced_focus_maintenance()
         
-        logger.info("✅ Admin panel v2.9.1 displayed - Focus management enhanced")
+        logger.info("  Admin panel displayed - Focus management enhanced")
     
     def _start_enhanced_focus_maintenance(self):
         """Enhanced focus maintenance"""
@@ -1011,7 +1011,7 @@ class ImprovedAdminGUI:
                     try:
                         current_focus = self.admin_window.focus_get()
                         if current_focus is None:
-                            logger.debug("🔄 Restoring admin focus")
+                            logger.debug("  Restoring admin focus")
                             self.admin_window.focus_force()
                     except:
                         pass
@@ -1131,7 +1131,7 @@ class ImprovedAdminGUI:
         self.admin_window.bind('<KP_Multiply>', lambda e: self._close())
         
         self.admin_window.focus_set()
-        logger.debug("✅ USB numpad bindings configured")
+        logger.debug("  USB numpad bindings configured")
     
     def _navigate(self, direction):
         self.selected = (self.selected + direction) % len(self.options)
@@ -1173,7 +1173,7 @@ class ImprovedAdminGUI:
         ]
         
         if 0 <= self.selected < len(actions):
-            logger.info(f"🔄 Executing action {self.selected + 1}")
+            logger.info(f"  Executing action {self.selected + 1}")
             actions[self.selected]()
 
     # ==== SPEAKER SETTINGS ====
@@ -1231,7 +1231,7 @@ class ImprovedAdminGUI:
                 EnhancedMessageBox.show_success(
                     self.admin_window,
                     "Loa đã tắt",
-                    "🔇 LOA TIẾNG VIỆT ĐÃ TẮT\n\n✅ Hệ thống chỉ sử dụng buzzer\n🔄 Có thể bật lại từ Option 7",
+                    "🔇 LOA TIẾNG VIỆT ĐÃ TẮT\n\n  Hệ thống chỉ sử dụng buzzer\n  Có thể bật lại từ Option 7",
                     self.system.buzzer,
                     None
                 )
@@ -1258,7 +1258,7 @@ class ImprovedAdminGUI:
                     EnhancedMessageBox.show_success(
                         self.admin_window,
                         "Loa đã bật",
-                        "🔊 LOA TIẾNG VIỆT ĐÃ BẬT\n\n✅ Sử dụng Google TTS Vietnamese\n🎵 Giọng nói tự nhiên",
+                        "🔊 LOA TIẾNG VIỆT ĐÃ BẬT\n\n  Sử dụng Google TTS Vietnamese\n🎵 Giọng nói tự nhiên",
                         self.system.buzzer,
                         self.system.speaker
                     )
@@ -1269,7 +1269,7 @@ class ImprovedAdminGUI:
                     EnhancedMessageBox.show_error(
                         self.admin_window,
                         "Lỗi khởi tạo loa",
-                        "❌ KHÔNG THỂ KHỞI TẠO LOA\n\n📦 Module vietnamese_speaker chưa có\n🔧 Cần cài đặt: gtts, pygame",
+                        "❌ KHÔNG THỂ KHỞI TẠO LOA\n\n📦 Module vietnamese_speaker chưa có\n  Cần cài đặt: gtts, pygame",
                         self.system.buzzer,
                         None
                     )
@@ -1345,7 +1345,7 @@ class ImprovedAdminGUI:
             EnhancedMessageBox.show_info(
                 self.admin_window,
                 "Sẵn sàng đăng ký",
-                "✅ Hệ thống đã sẵn sàng\n✅ Cảm biến được bảo vệ\n\nBắt đầu quá trình đăng ký...",
+                "  Hệ thống đã sẵn sàng\n\nBắt đầu quá trình đăng ký...",
                 self.system.buzzer,
                 getattr(self.system, 'speaker', None)
             )
@@ -1408,7 +1408,7 @@ class ImprovedAdminGUI:
             logger.info("⏳ Waiting for threads to stop...")
             time.sleep(3)
             
-            logger.info("✅ All competing threads paused successfully")
+            logger.info("  All competing threads paused successfully")
             return True
             
         except Exception as e:
@@ -1435,7 +1435,7 @@ class ImprovedAdminGUI:
             # 3. Resume focus maintenance
             self._resume_focus_maintenance()
             
-            logger.info("✅ All system threads resumed")
+            logger.info("  All system threads resumed")
             
         except Exception as e:
             logger.error(f"❌ Error resuming threads: {e}")
@@ -1456,7 +1456,7 @@ class ImprovedAdminGUI:
                 enrollment_dialog.show()
                 
                 if enrollment_dialog.cancelled:
-                    logger.info("👤 Enrollment cancelled by user at start")
+                    logger.info("  Enrollment cancelled by user at start")
                     return
                 
                 # Update status
@@ -1490,7 +1490,7 @@ class ImprovedAdminGUI:
                 try:
                     self.system.fingerprint.convertImage(0x01)
                     self.system.buzzer.beep("click")
-                    logger.debug("✅ First image converted successfully")
+                    logger.debug("  First image converted successfully")
                 except Exception as e:
                     enrollment_dialog.update_status("LỖI BƯỚC 1", f"Không thể xử lý ảnh:\n{str(e)}")
                     time.sleep(3)
@@ -1522,7 +1522,7 @@ class ImprovedAdminGUI:
                 try:
                     self.system.fingerprint.convertImage(0x02)
                     self.system.buzzer.beep("click")
-                    logger.debug("✅ Second image converted successfully")
+                    logger.debug("  Second image converted successfully")
                 except Exception as e:
                     enrollment_dialog.update_status("LỖI BƯỚC 2", f"Không thể xử lý ảnh:\n{str(e)}")
                     time.sleep(3)
@@ -1541,7 +1541,7 @@ class ImprovedAdminGUI:
                     enrollment_dialog.update_status("LƯU TEMPLATE", f"Lưu dữ liệu...")
                     self.system.fingerprint.storeTemplate(position, 0x01)
                     
-                    logger.debug("✅ Template created and stored successfully")
+                    logger.debug("  Template created and stored successfully")
                 except Exception as e:
                     enrollment_dialog.update_status("LỖI TEMPLATE", f"Không thể tạo template:\n{str(e)}")
                     time.sleep(3)
@@ -1557,10 +1557,10 @@ class ImprovedAdminGUI:
                     total_fps = len(self.system.admin_data.get_fingerprint_ids())
                     
                     # Success!
-                    enrollment_dialog.update_status("THÀNH CÔNG ✅", f"Đăng ký thành công!\nVị trí: {position}")
+                    enrollment_dialog.update_status("THÀNH CÔNG  ", f"Đăng ký thành công!\nVị trí: {position}")
                     time.sleep(2)
                     
-                    logger.info(f"✅ Enrollment successful: ID {position}")
+                    logger.info(f"  Enrollment successful: ID {position}")
                     
                     # Schedule success display
                     self.admin_window.after(0, lambda: self._show_complete_enrollment_success(position, total_fps))
@@ -1595,7 +1595,7 @@ class ImprovedAdminGUI:
         while time.time() - start_time < timeout:
             # Check cancellation
             if dialog.cancelled:
-                logger.info(f"👤 {step} scan cancelled by user")
+                logger.info(f"  {step} scan cancelled by user")
                 return False
             
             # Verify we still have exclusive sensor access
@@ -1607,8 +1607,8 @@ class ImprovedAdminGUI:
             
             try:
                 if self.system.fingerprint.readImage():
-                    logger.debug(f"✅ {step} scan successful")
-                    dialog.update_status(f"BƯỚC {step_num}/2 ✅", f"Quét {step} thành công!")
+                    logger.debug(f"  {step} scan successful")
+                    dialog.update_status(f"BƯỚC {step_num}/2  ", f"Quét {step} thành công!")
                     return True
                 
                 # Update progress every few attempts
@@ -1654,8 +1654,8 @@ class ImprovedAdminGUI:
             
             try:
                 if not self.system.fingerprint.readImage():
-                    logger.debug("✅ Finger removed successfully")
-                    dialog.update_status("NGHỈ ✅", "Đã nhấc ngón tay thành công")
+                    logger.debug("  Finger removed successfully")
+                    dialog.update_status("NGHỈ  ", "Đã nhấc ngón tay thành công")
                     time.sleep(1)
                     return True
                 
@@ -1668,7 +1668,7 @@ class ImprovedAdminGUI:
                 
             except:
                 # If readImage fails, assume finger removed
-                logger.debug("✅ Finger removal detected via exception")
+                logger.debug("  Finger removal detected via exception")
                 return True
         
         # Timeout - but continue anyway
@@ -1693,7 +1693,7 @@ class ImprovedAdminGUI:
                     continue
                 except:
                     # Exception means position is available
-                    logger.debug(f"✅ Found available position {i}")
+                    logger.debug(f"  Found available position {i}")
                     return i
             
             # No available positions
@@ -1712,15 +1712,15 @@ class ImprovedAdminGUI:
         
         # 🎨 SIMPLIFIED SUCCESS MESSAGE
         success_msg = (
-            f"✅ ĐĂNG KÝ VÂN TAY HOÀN TẤT!\n\n"
+            f"  ĐĂNG KÝ VÂN TAY HOÀN TẤT!\n\n"
             f"📍 Vị trí lưu: {position}\n"
             f"📊 Tổng vân tay: {total}\n"
             f"⏰ Thời gian: {datetime.now().strftime('%H:%M:%S')}\n"
-            f"👤 Đăng ký bởi: KHOI1235567\n\n"
+            f"  Đăng ký bởi: KHOI1235567\n\n"
             f"Quay về menu admin..."
         )
         
-        # 🔧 ENHANCED FOCUS FOR SUCCESS DIALOG
+        #   ENHANCED FOCUS FOR SUCCESS DIALOG
         def show_success_with_focus():
             EnhancedMessageBox.show_success(
                 self.admin_window,
@@ -1730,7 +1730,7 @@ class ImprovedAdminGUI:
                 getattr(self.system, 'speaker', None)
             )
             
-            # 🔧 ENSURE ADMIN WINDOW GETS FOCUS BACK
+            #   ENSURE ADMIN WINDOW GETS FOCUS BACK
             if self.admin_window and self.admin_window.winfo_exists():
                 self.admin_window.after(100, self._safe_focus_admin)
                 self.admin_window.after(300, self._safe_focus_admin)
@@ -1742,14 +1742,14 @@ class ImprovedAdminGUI:
         if hasattr(self.system, 'discord_bot') and self.system.discord_bot:
             try:
                 discord_msg = (
-                    f"👆 **VÂN TAY ĐĂNG KÝ THÀNH CÔNG v2.9.1**\n"
+                    f"👆 **VÂN TAY ĐĂNG KÝ THÀNH CÔNG **\n"
                     f"🆔 **ID**: {position}\n"
                     f"📊 **Tổng**: {total} vân tay\n"
                     f"🕐 **Time**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-                    f"👤 **User**: KHOI1235567\n"
-                    f"🎯 **Version**: Simplified UI v2.9.1\n"
-                    f"🔧 **Focus**: Enhanced management\n"
-                    f"✅ **Status**: Perfect execution"
+                    f"  **User**: KHOI1235567\n"
+                    f"🎯 **Version**: Simplified UI \n"
+                    f"  **Focus**: Enhanced management\n"
+                    f"  **Status**: Perfect execution"
                 )
                 threading.Thread(
                     target=self.system._send_discord_notification,
@@ -1759,7 +1759,7 @@ class ImprovedAdminGUI:
             except Exception as e:
                 logger.warning(f"Discord notification failed: {e}")
         
-        # 🔧 BETTER ADMIN WINDOW MANAGEMENT
+        #   BETTER ADMIN WINDOW MANAGEMENT
         def reopen_admin():
             if self.admin_window:
                 self.admin_window.destroy()
@@ -1790,7 +1790,7 @@ class ImprovedAdminGUI:
             # 3. Resume focus management
             self._resume_focus_maintenance()
             
-            logger.info("✅ Enrollment cleanup finished successfully")
+            logger.info("  Enrollment cleanup finished successfully")
             
         except Exception as e:
             logger.error(f"❌ Cleanup error: {e}")
@@ -1806,7 +1806,7 @@ class ImprovedAdminGUI:
     # ==== OTHER ADMIN METHODS - ENHANCED FOCUS ====
     
     def _change_passcode(self):
-        """🔧 ENHANCED: Passcode change với better focus management"""
+        """  ENHANCED: Passcode change với better focus management"""
         # VOICE: Announce passcode change
         if hasattr(self.system, 'speaker') and self.system.speaker:
             self.system.speaker.speak("", "Thay đổi mật khẩu hệ thống")
@@ -1825,14 +1825,14 @@ class ImprovedAdminGUI:
         
         self._resume_focus_maintenance()
         
-        # 🔧 ENSURE ADMIN WINDOW FOCUS AFTER DIALOG
+        #   ENSURE ADMIN WINDOW FOCUS AFTER DIALOG
         if self.admin_window and self.admin_window.winfo_exists():
             self.admin_window.after(100, self._safe_focus_admin)
             self.admin_window.after(300, self._safe_focus_admin)
         
         if new_pass and 4 <= len(new_pass) <= 8:
             if self.system.admin_data.set_passcode(new_pass):
-                # 🔧 SUCCESS DIALOG WITH FOCUS MANAGEMENT
+                #   SUCCESS DIALOG WITH FOCUS MANAGEMENT
                 def show_success():
                     EnhancedMessageBox.show_success(
                         self.admin_window, 
@@ -1841,14 +1841,14 @@ class ImprovedAdminGUI:
                         self.system.buzzer,
                         getattr(self.system, 'speaker', None)
                     )
-                    # 🔧 RESTORE FOCUS TO ADMIN
+                    #   RESTORE FOCUS TO ADMIN
                     if self.admin_window and self.admin_window.winfo_exists():
                         self.admin_window.after(100, self._safe_focus_admin)
                 
                 self.admin_window.after(0, show_success)
-                logger.info("✅ Passcode changed via enhanced method")
+                logger.info("  Passcode changed via enhanced method")
             else:
-                # 🔧 ERROR DIALOG WITH FOCUS MANAGEMENT
+                #   ERROR DIALOG WITH FOCUS MANAGEMENT
                 def show_error():
                     EnhancedMessageBox.show_error(
                         self.admin_window, 
@@ -1857,13 +1857,13 @@ class ImprovedAdminGUI:
                         self.system.buzzer,
                         getattr(self.system, 'speaker', None)
                     )
-                    # 🔧 RESTORE FOCUS TO ADMIN
+                    #   RESTORE FOCUS TO ADMIN
                     if self.admin_window and self.admin_window.winfo_exists():
                         self.admin_window.after(100, self._safe_focus_admin)
                 
                 self.admin_window.after(0, show_error)
         elif new_pass:
-            # 🔧 VALIDATION ERROR WITH FOCUS
+            #   VALIDATION ERROR WITH FOCUS
             def show_validation_error():
                 EnhancedMessageBox.show_error(
                     self.admin_window, 
@@ -1872,7 +1872,7 @@ class ImprovedAdminGUI:
                     self.system.buzzer,
                     getattr(self.system, 'speaker', None)
                 )
-                # 🔧 RESTORE FOCUS TO ADMIN
+                #   RESTORE FOCUS TO ADMIN
                 if self.admin_window and self.admin_window.winfo_exists():
                     self.admin_window.after(100, self._safe_focus_admin)
             
@@ -1890,7 +1890,7 @@ class ImprovedAdminGUI:
             EnhancedMessageBox.show_info(
                 self.admin_window, 
                 "Thêm thẻ RFID", 
-                "Đặt thẻ lên đầu đọc trong 15 giây...", 
+                "Đặt thẻ lên đầu đọc", 
                 self.system.buzzer,
                 getattr(self.system, 'speaker', None)
             )
@@ -1914,16 +1914,16 @@ class ImprovedAdminGUI:
                             total_rfid = len(self.system.admin_data.get_rfid_uids())
                             self.admin_window.after(0, lambda: self._show_result_threadsafe(
                                 "success", "Thêm thành công", 
-                                f"✅ Đã thêm thẻ RFID thành công!\n\nUID: {uid_display}\nTổng thẻ: {total_rfid}"
+                                f"  Đã thêm thẻ RFID thành công!\n\nUID: {uid_display}\nTổng thẻ: {total_rfid}"
                             ))
-                            logger.info(f"✅ RFID added: {uid_list}")
+                            logger.info(f"  RFID added: {uid_list}")
                         else:
                             self.admin_window.after(0, lambda: self._show_result_threadsafe(
                                 "error", "Lỗi", "Không thể lưu thẻ vào cơ sở dữ liệu."
                             ))
                     else:
                         self.admin_window.after(0, lambda: self._show_result_threadsafe(
-                            "error", "Không phát hiện thẻ", "Không phát hiện thẻ RFID nào trong 15 giây."
+                            "error", "Không phát hiện thẻ", "Không phát hiện thẻ RFID nào trong"
                         ))
                         
                 except Exception as e:
@@ -1950,7 +1950,7 @@ class ImprovedAdminGUI:
     def _show_result_threadsafe(self, msg_type, title, message):
         """Show result với voice support và ENHANCED FOCUS management"""
         def show_with_focus():
-            # 🔧 PAUSE FOCUS MAINTENANCE DURING DIALOG
+            #   PAUSE FOCUS MAINTENANCE DURING DIALOG
             self._pause_focus_maintenance()
             
             if msg_type == "success":
@@ -1970,7 +1970,7 @@ class ImprovedAdminGUI:
                     getattr(self.system, 'speaker', None)
                 )
             
-            # 🔧 ENHANCED FOCUS RESTORATION WITH MULTIPLE ATTEMPTS
+            #   ENHANCED FOCUS RESTORATION WITH MULTIPLE ATTEMPTS
             def restore_admin_focus_enhanced():
                 if self.admin_window and self.admin_window.winfo_exists():
                     try:
@@ -1984,7 +1984,7 @@ class ImprovedAdminGUI:
                         # Remove topmost after focusing
                         self.admin_window.after(100, lambda: self.admin_window.attributes('-topmost', False))
                         
-                        logger.debug("🔧 Enhanced admin focus restored")
+                        logger.debug("  Enhanced admin focus restored")
                     except Exception as e:
                         logger.debug(f"Focus restoration error: {e}")
             
@@ -2053,13 +2053,13 @@ class ImprovedAdminGUI:
             return
             
         sel_window = tk.Toplevel(self.admin_window)
-        sel_window.title(f"{title} - v2.9.1")  # 🎨 SIMPLIFIED
+        sel_window.title(f"{title} - ")  # 🎨 SIMPLIFIED
         sel_window.geometry("700x600")
         sel_window.configure(bg=Colors.DARK_BG)
         sel_window.transient(self.admin_window)
         sel_window.grab_set()
         
-        # 🔧 ENHANCED FOCUS FOR SELECTION DIALOG
+        #   ENHANCED FOCUS FOR SELECTION DIALOG
         sel_window.lift()
         sel_window.focus_force()
         sel_window.attributes('-topmost', True)
@@ -2074,7 +2074,7 @@ class ImprovedAdminGUI:
         def close_selection_dialog():
             if not dialog_closed['value']:
                 dialog_closed['value'] = True
-                logger.info(f"✅ Selection dialog closed for {item_type}")
+                logger.info(f"  Selection dialog closed for {item_type}")
                 
                 # VOICE: Cancel selection
                 if hasattr(self.system, 'speaker') and self.system.speaker:
@@ -2087,7 +2087,7 @@ class ImprovedAdminGUI:
                 except:
                     pass
                 
-                # 🔧 RESTORE ADMIN FOCUS
+                #   RESTORE ADMIN FOCUS
                 if self.admin_window and self.admin_window.winfo_exists():
                     self.admin_window.after(100, self._safe_focus_admin)
                 
@@ -2137,7 +2137,7 @@ class ImprovedAdminGUI:
                             pass
                         callback(idx)
                         
-                        # 🔧 RESTORE ADMIN FOCUS
+                        #   RESTORE ADMIN FOCUS
                         if self.admin_window and self.admin_window.winfo_exists():
                             self.admin_window.after(100, self._safe_focus_admin)
                         
@@ -2192,7 +2192,7 @@ class ImprovedAdminGUI:
                                 pass
                             callback(idx)
                             
-                            # 🔧 RESTORE ADMIN FOCUS
+                            #   RESTORE ADMIN FOCUS
                             if self.admin_window and self.admin_window.winfo_exists():
                                 self.admin_window.after(100, self._safe_focus_admin)
                             
@@ -2204,7 +2204,7 @@ class ImprovedAdminGUI:
         
         setup_bindings()
         
-        # 🔧 ENHANCED FOCUS FOR SELECTION DIALOG
+        #   ENHANCED FOCUS FOR SELECTION DIALOG
         sel_window.focus_set()
         sel_window.after(50, lambda: sel_window.focus_force())
         sel_window.after(150, lambda: sel_window.focus_set())
@@ -2230,12 +2230,12 @@ class ImprovedAdminGUI:
                 EnhancedMessageBox.show_success(
                     self.admin_window, 
                     "Xóa thành công", 
-                    f"✅ Đã xóa thẻ RFID thành công!\n\nCòn lại: {remaining_count} thẻ",
+                    f" Đã xóa thẻ RFID thành công!\n\nCòn lại: {remaining_count} thẻ",
                     self.system.buzzer,
                     getattr(self.system, 'speaker', None)
                 )
                 
-                logger.info(f"✅ RFID removed: {uid}")
+                logger.info(f"  RFID removed: {uid}")
                 
             else:
                 EnhancedMessageBox.show_error(
@@ -2268,12 +2268,12 @@ class ImprovedAdminGUI:
                     EnhancedMessageBox.show_success(
                         self.admin_window, 
                         "Xóa thành công", 
-                        f"✅ Đã xóa vân tay ID {fp_id} thành công!\n\nCòn lại: {remaining_count} vân tay",
+                        f" Đã xóa vân tay ID {fp_id} thành công!\n\nCòn lại: {remaining_count} vân tay",
                         self.system.buzzer,
                         getattr(self.system, 'speaker', None)
                     )
                     
-                    logger.info(f"✅ Fingerprint removed: ID {fp_id}")
+                    logger.info(f"  Fingerprint removed: ID {fp_id}")
                     
                 else:
                     EnhancedMessageBox.show_error(
@@ -2338,7 +2338,7 @@ class ImprovedAdminGUI:
                         getattr(self.system, 'speaker', None)
                     )
                     
-                    logger.info(f"✅ Mode change: {current_mode} → {new_mode}")
+                    logger.info(f"  Mode change: {current_mode} → {new_mode}")
                     
                     self.admin_window.destroy()
                     self.admin_window = None
@@ -2373,11 +2373,11 @@ class ImprovedAdminGUI:
         if EnhancedMessageBox.ask_yesno(
             self.admin_window, 
             "Thoát quản trị", 
-            "Thoát chế độ quản trị v2.9.1?\n\nHệ thống sẽ quay về chế độ xác thực bình thường.",
+            "Thoát chế độ quản trị ?\n\nHệ thống sẽ quay về chế độ xác thực bình thường.",
             self.system.buzzer,
             getattr(self.system, 'speaker', None)
         ):
-            logger.info("✅ Admin panel v2.9.1 closed by user")
+            logger.info("  Admin panel  closed by user")
             
             self.focus_maintenance_active = False
             
@@ -2407,14 +2407,14 @@ GUIAdminCaiTien = ImprovedAdminGUI
 # ==== MAIN EXECUTION CHECK ====
 if __name__ == "__main__":
     print("=" * 80)
-    print("🔧 ENHANCED COMPONENTS v2.9.1 - FOCUS FIXED + SIMPLIFIED UI")
+    print("  ENHANCED COMPONENTS - FOCUS FIXED + SIMPLIFIED UI")
     print(f"📅 Updated: 2025-07-06 06:52:53 UTC")
-    print(f"👤 User: KHOI1235567")
+    print(f"  User: KHOI1235567")
     print("🎯 Status: Production Ready - Focus Management Fixed + Simplified Interface")
     print("=" * 80)
     print()
-    print("✅ FIXES IMPLEMENTED:")
-    print("   🔧 FOCUS MANAGEMENT:")
+    print("  FIXES IMPLEMENTED:")
+    print("     FOCUS MANAGEMENT:")
     print("      ✓ Multiple focus attempts với delays (50ms, 150ms, 300ms)")
     print("      ✓ _ensure_focus() method cho tất cả dialogs")
     print("      ✓ _restore_parent_focus() trước khi destroy dialogs")
@@ -2426,7 +2426,7 @@ if __name__ == "__main__":
     print("      ✓ Cleaner titles và headers")
     print("      ✓ Reduced verbose text everywhere")
     print()
-    print("   🔧 SPECIFIC FIXES:")
+    print("     SPECIFIC FIXES:")
     print("      ✓ Passcode dialog focus - Multiple focus attempts after dialog closes")
     print("      ✓ Fingerprint enrollment focus - Enhanced parent focus restoration")
     print("      ✓ Admin panel focus - Better focus maintenance during operations")
@@ -2445,7 +2445,7 @@ if __name__ == "__main__":
     print("   🎯 Admin actions với voice feedback")
     print("   🚪 Door operations announced")
     print("   ⚠️ Error messages và warnings")
-    print("   🔄 System status updates")
+    print("     System status updates")
     print("   🎛️ Mode changes announced")
     print()
     print("🔐 ADMIN FUNCTIONS (8 OPTIONS):")
@@ -2466,14 +2466,14 @@ if __name__ == "__main__":
     print("   • Space: Activate selected")
     print("   • Escape: Emergency exit")
     print()
-    print("🔧 TECHNICAL ENHANCEMENTS:")
-    print("   • Focus Management: ✅ Enhanced với multiple attempts")
-    print("   • Thread-Safe: ✅ Complete implementation")
-    print("   • Memory Safe: ✅ Proper resource management")
-    print("   • USB Compatible: ✅ Full numpad support")
-    print("   • Voice Integration: ✅ Vietnamese Speaker")
-    print("   • UI Simplified: ✅ Cleaner interface")
-    print("   • Error Handling: ✅ Comprehensive coverage")
+    print("  TECHNICAL ENHANCEMENTS:")
+    print("   • Focus Management:   Enhanced với multiple attempts")
+    print("   • Thread-Safe:   Complete implementation")
+    print("   • Memory Safe:   Proper resource management")
+    print("   • USB Compatible:   Full numpad support")
+    print("   • Voice Integration:   Vietnamese Speaker")
+    print("   • UI Simplified:   Cleaner interface")
+    print("   • Error Handling:   Comprehensive coverage")
     print()
     print("📊 INTEGRATION STATUS:")
     print("   🟢 ThreadSafeFingerprintManager: Ready")
@@ -2496,13 +2496,13 @@ if __name__ == "__main__":
     print("   USB: Full numpad support")
     print("   Sensor: Exclusive access management")
     print()
-    print("✅ ENHANCED COMPONENTS v2.9.1 - FOCUS FIXED + SIMPLIFIED!")
-    print("🔧 Tất cả focus issues đã được giải quyết")
+    print("  ENHANCED COMPONENTS  - FOCUS FIXED + SIMPLIFIED!")
+    print("  Tất cả focus issues đã được giải quyết")
     print("🎨 UI đã được simplified và cleaner")
     print("🔊 Voice integration hoàn chỉnh và intelligent")
     print("📱 USB numpad support đầy đủ cho tất cả components")
     print("🛡️ Thread-safe operations cho all background tasks")
     print("💬 Discord integration với enhanced notifications")
-    print("🔄 Backward compatibility với existing codebase")
+    print("  Backward compatibility với existing codebase")
     print("=" * 80)
         
