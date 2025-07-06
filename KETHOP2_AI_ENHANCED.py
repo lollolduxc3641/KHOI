@@ -34,7 +34,7 @@ try:
     from discord_integration import DiscordSecurityBot
 except ImportError as e:
     print(f"❌ Lỗi import modules: {e}")
-    print("🔧 Đảm bảo các file sau tồn tại:")
+    print("  Đảm bảo các file sau tồn tại:")
     print("   - improved_face_recognition.py")
     print("   - enhanced_components.py")
     print("   - discord_integration.py")
@@ -213,7 +213,7 @@ logger = logging.getLogger(__name__)
 logger.info("=" * 80)
 logger.info("🚀 HỆ THỐNG KHÓA BẢO MẬT v2.4.0 - VIETNAMESE SPEAKER INTEGRATION")
 logger.info("📅 Started: 2025-07-06 05:52:51 UTC")
-logger.info("👤 User: KHOI1235567")
+logger.info("  User: KHOI1235567")
 logger.info("🔊 Enhancement: Vietnamese Speaker integration, voice replaces buzzer")
 logger.info("=" * 80)
 
@@ -231,7 +231,7 @@ class VietnameseSecurityGUI:
         self._create_widgets()
         self._setup_bindings()
         
-        logger.info("✅ VietnameseSecurityGUI khởi tạo - Enhanced interface v2.4.0 with speaker")
+        logger.info("  VietnameseSecurityGUI khởi tạo - Enhanced interface v2.4.0 with speaker")
     
     def update_fingerprint_status(self, status_type, message, details=""):
         """Smart update cho fingerprint status"""
@@ -297,7 +297,7 @@ class VietnameseSecurityGUI:
         header_left = tk.Frame(header, bg=Colors.PRIMARY)
         header_left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
-        tk.Label(header_left, text="CAMERA NHẬN DIỆN + LOA",
+        tk.Label(header_left, text="CAMERA NHẬN DIỆN",
                 font=('Arial', 24, 'bold'), fg='white', bg=Colors.PRIMARY,
                 anchor='w').pack(side=tk.LEFT, padx=20, expand=True, fill=tk.X)
         
@@ -337,7 +337,7 @@ class VietnameseSecurityGUI:
                                    fg=Colors.PRIMARY, bg=Colors.CARD_BG)
         self.face_status.pack(expand=True)
         
-        self.detection_info = tk.Label(status_frame, text="Chuẩn bị nhận diện + loa",
+        self.detection_info = tk.Label(status_frame, text="Chuẩn bị nhận diện",
                                       font=('Arial', 14), 
                                       fg=Colors.TEXT_SECONDARY, bg=Colors.CARD_BG)
         self.detection_info.pack()
@@ -352,7 +352,7 @@ class VietnameseSecurityGUI:
         header.pack(fill=tk.X, padx=4, pady=4)
         header.pack_propagate(False)
         
-        tk.Label(header, text="TRẠNG THÁI XÁC THỰC + LOA",
+        tk.Label(header, text="TRẠNG THÁI XÁC THỰC",
                 font=('Arial', 20, 'bold'), fg='white', bg=Colors.SUCCESS).pack(pady=(15, 5))
         
         self.auth_mode_label = tk.Label(header, text="CHẾ ĐỘ: ĐANG TẢI",
@@ -433,7 +433,7 @@ class VietnameseSecurityGUI:
                 font=('Arial', 16, 'bold'),
                 fg=Colors.TEXT_PRIMARY, bg=Colors.BACKGROUND).pack(anchor='w', padx=15, pady=(12,6))
         
-        self.detail_message = tk.Label(msg_frame, text="Khởi động hệ thống nhận diện + loa...",
+        self.detail_message = tk.Label(msg_frame, text="Khởi động hệ thống nhận diện",
                                       font=('Arial', 14),
                                       fg=Colors.TEXT_SECONDARY, bg=Colors.BACKGROUND,
                                       wraplength=420, justify=tk.LEFT, anchor='w')
@@ -454,7 +454,7 @@ class VietnameseSecurityGUI:
         status_bar.pack_propagate(False)
         
         self.main_status = tk.Label(status_bar, 
-                                   text="HỆ THỐNG KHÓA CỬA THÔNG MINH v2.4.0 + LOA TIẾNG VIỆT - ĐANG KHỞI ĐỘNG",
+                                   text="HỆ THỐNG KHÓA CỬA THÔNG MINH KHỞI ĐỘNG",
                                    font=('Arial', 20, 'bold'),
                                    fg='white', bg=Colors.PRIMARY)
         self.main_status.pack(expand=True)
@@ -477,7 +477,7 @@ class VietnameseSecurityGUI:
         elif key == 'Escape':
             if hasattr(self, 'system_ref') and hasattr(self.system_ref, 'buzzer'):
                 if EnhancedMessageBox.ask_yesno(self.root, "Thoát hệ thống", 
-                                            "Bạn có chắc chắn muốn thoát?", 
+                                            "Chắc chắn muốn thoát?", 
                                             self.system_ref.buzzer,
                                             getattr(self.system_ref, 'speaker', None)):
                     self.root.quit()
@@ -674,7 +674,7 @@ class VietnameseSecuritySystem:
     
     def __init__(self):
         self.config = Config()
-        logger.info("🚀 Khởi tạo Hệ thống Khóa Cửa Thông minh v2.4.0 - Vietnamese Speaker")
+        logger.info("🚀 Khởi tạo Hệ thống Khóa Cửa Thông minh")
         
         self._init_hardware()
         self._init_components()
@@ -701,7 +701,7 @@ class VietnameseSecuritySystem:
         self.any_mode_active_threads = {}
         self.any_mode_lock = threading.Lock()
         
-        logger.info(f"✅ Hệ thống khởi tạo thành công - Chế độ: {auth_mode.upper()}")
+        logger.info(f"Hệ thống khởi tạo thành công - Chế độ: {auth_mode.upper()}")
     
     def _init_hardware(self):
         """Khởi tạo phần cứng - GIỮ NGUYÊN"""
@@ -745,7 +745,7 @@ class VietnameseSecuritySystem:
             logger.info("Continuing in simulation mode...")
     
     def _init_components(self):
-        """Khởi tạo các thành phần hệ thống + SPEAKER"""
+        """Khởi tạo các thành phần hệ thống"""
         try:
             logger.info("Khởi tạo các thành phần hệ thống...")
             
@@ -773,7 +773,7 @@ class VietnameseSecuritySystem:
                 # INTEGRATE SPEAKER WITH BUZZER
                 self.buzzer = EnhancedBuzzerManager(self.config.BUZZER_GPIO, self.speaker)
                 
-                logger.info(f"✅ Vietnamese Speaker tích hợp - Enabled: {speaker_enabled}, Volume: {speaker_volume}")
+                logger.info(f"Vietnamese Speaker tích hợp - Enabled: {speaker_enabled}, Volume: {speaker_volume}")
             except ImportError as e:
                 self.speaker = None
                 logger.warning(f"⚠️ Vietnamese Speaker không khả dụng: {e}")
@@ -807,7 +807,7 @@ class VietnameseSecuritySystem:
             raise
     
     def _force_admin_mode(self):
-        """Chế độ admin nhanh bằng phím * + VOICE"""
+        """Chế độ admin nhanh bằng phím *"""
         # VOICE: Admin access attempt
         if self.speaker:
             self.speaker.speak("", "Truy cập quản trị")
@@ -852,11 +852,11 @@ class VietnameseSecuritySystem:
     # ==== ENHANCED AUTHENTICATION METHODS WITH VOICE ====
     
     def start_authentication(self):
-        """ENHANCED: Bắt đầu quy trình xác thực với INTELLIGENT voice"""
+        """ENHANCED: Bắt đầu quy trình xác thực"""
         current_mode = self.admin_data.get_authentication_mode()
         self.auth_state.set_mode(current_mode)
         
-        logger.info(f"🔄 Bắt đầu quy trình xác thực - Chế độ: {current_mode.upper()}")
+        logger.info(f"  Bắt đầu quy trình xác thực - Chế độ: {current_mode.upper()}")
         
         # 🧠 INTELLIGENT VOICE: Only announce mode if truly new session
         if hasattr(self, 'speaker') and self.speaker:
@@ -881,8 +881,8 @@ class VietnameseSecuritySystem:
             self._start_any_authentication()
 
     def _start_sequential_authentication(self):
-        """Bắt đầu xác thực tuần tự với INTELLIGENT voice"""
-        logger.info("🛡️ Khởi động chế độ xác thực tuần tự")
+        """Bắt đầu xác thực tuần tự"""
+        logger.info("Khởi động chế độ xác thực tuần tự")
         
         # 🧠 INTELLIGENT VOICE: Only announce step if starting fresh
         if hasattr(self, 'speaker') and self.speaker:
@@ -892,7 +892,7 @@ class VietnameseSecuritySystem:
         
         self.gui.update_step(1, "NHẬN DIỆN KHUÔN MẶT", "Hệ thống đang phân tích", Colors.PRIMARY)
         self.gui.update_status("XÁC THỰC TUẦN TỰ - BƯỚC 1/4: PHÂN TÍCH KHUÔN MẶT", 'white')
-        self.gui.update_detail("🛡️ Chế độ bảo mật cao - Tuần tự 4 lớp\nHệ thống nhận diện đang quét và phân tích khuôn mặt.\nNhìn thẳng vào camera và giữ nguyên tư thế.", Colors.PRIMARY)
+        self.gui.update_detail("Chế độ bảo mật cao - Tuần tự 4 lớp\nHệ thống nhận diện đang quét và phân tích khuôn mặt.\nNhìn thẳng vào camera và giữ nguyên tư thế.", Colors.PRIMARY)
         
         self.gui.detection_stats = {"total": 0, "recognized": 0}
         
@@ -914,7 +914,7 @@ class VietnameseSecuritySystem:
         
         self.gui.update_step(0, "XÁC THỰC BẤT KỲ", "Chọn phương thức xác thực", Colors.WARNING)
         self.gui.update_status("CHẾ ĐỘ TRUY CẬP NHANH - SỬ DỤNG BẤT KỲ PHƯƠNG THỨC NÀO", 'yellow')
-        self.gui.update_detail("⚡ CHỌN PHƯƠNG THỨC XÁC THỰC:\n👤 KHUÔN MẶT: Nhìn vào camera\n👆 VÂN TAY: Đặt ngón tay lên cảm biến\n📱 THẺ TỪ: Đưa thẻ lại gần đầu đọc\n🔑 MẬT KHẨU: Nhấn # để nhập\n🔊 Loa sẽ thông báo khi xác thực thành công", Colors.WARNING)
+        self.gui.update_detail(" CHỌN PHƯƠNG THỨC XÁC THỰC:\n KHUÔN MẶT: Nhìn vào camera\nVÂN TAY: Đặt ngón tay lên cảm biến\n📱 THẺ TỪ: Đưa thẻ lại gần đầu đọc\n MẬT KHẨU: Nhấn # để nhập", Colors.WARNING)
         
         self.gui.detection_stats = {"total": 0, "recognized": 0}
         self._start_concurrent_authentication()
@@ -932,32 +932,32 @@ class VietnameseSecuritySystem:
                     self.any_mode_active_threads["face"] = threading.Thread(
                         target=self._any_mode_face_loop, daemon=True)
                     self.any_mode_active_threads["face"].start()
-                    logger.debug("✅ Face recognition thread started")
+                    logger.debug(" Face recognition thread started")
                 
                 # Start fingerprint scanning
                 if "fingerprint" not in self.any_mode_active_threads or not self.any_mode_active_threads["fingerprint"].is_alive():
                     self.any_mode_active_threads["fingerprint"] = threading.Thread(
                         target=self._any_mode_fingerprint_loop, daemon=True)
                     self.any_mode_active_threads["fingerprint"].start()
-                    logger.debug("✅ Fingerprint thread started")
+                    logger.debug("  Fingerprint thread started")
                 
                 # Start RFID scanning
                 if "rfid" not in self.any_mode_active_threads or not self.any_mode_active_threads["rfid"].is_alive():
                     self.any_mode_active_threads["rfid"] = threading.Thread(
                         target=self._any_mode_rfid_loop, daemon=True)
                     self.any_mode_active_threads["rfid"].start()
-                    logger.debug("✅ RFID thread started")
+                    logger.debug("  RFID thread started")
                 
-                logger.info("✅ Tất cả phương thức xác thực đã sẵn sàng trong chế độ Any")
+                logger.info(" Tất cả phương thức xác thực đã sẵn sàng trong chế độ Any")
                 
                 # 🎨 ENHANCED GUIDANCE MESSAGE
                 guidance_message = (
-                    "⚡ CHỌN PHƯƠNG THỨC XÁC THỰC:\n"
-                    "👤 KHUÔN MẶT: Nhìn vào camera\n"
-                    "👆 VÂN TAY: Đặt ngón tay lên cảm biến\n"
-                    "📱 THẺ TỪ: Đưa thẻ lại gần đầu đọc\n"
-                    "🔑 MẬT KHẨU: Nhấn # để nhập\n"
-                    "🔊 Loa sẽ thông báo khi xác thực thành công"
+                    " CHỌN PHƯƠNG THỨC XÁC THỰC:\n"
+                    " KHUÔN MẶT: Nhìn vào camera\n"
+                    " VÂN TAY: Đặt ngón tay lên cảm biến\n"
+                    " THẺ TỪ: Đưa thẻ lại gần đầu đọc\n"
+                    " MẬT KHẨU: Nhấn # để nhập\n"
+        
                 )
                 
                 self.root.after(0, lambda: self.gui.update_detail(guidance_message, Colors.SUCCESS))
@@ -985,15 +985,15 @@ class VietnameseSecuritySystem:
                 self.root.unbind('<numbersign>')
                 self.root.unbind('<KP_Add>')
                 
-                logger.debug("✅ All authentication threads stopped")
+                logger.debug(" All authentication threads stopped")
         except Exception as e:
-            logger.error(f"❌ Error stopping auth threads: {e}")
+            logger.error(f" Error stopping auth threads: {e}")
     
     # ==== ANY MODE AUTHENTICATION LOOPS WITH VOICE ====
     
     def _any_mode_face_loop(self):
         """Face recognition loop cho any mode + VOICE"""
-        logger.debug("🎭 Any mode face loop started")
+        logger.debug(" Any mode face loop started")
         consecutive_count = 0
         
         while (self.running and 
@@ -1011,7 +1011,7 @@ class VietnameseSecuritySystem:
                     consecutive_count += 1
                     
                     if consecutive_count >= self.config.FACE_REQUIRED_CONSECUTIVE:
-                        logger.info(f"✅ Any mode face success: {result.person_name}")
+                        logger.info(f" Any mode face success: {result.person_name}")
                         
                         # VOICE: Success announcement
                         if self.speaker:
@@ -1022,21 +1022,21 @@ class VietnameseSecuritySystem:
                     else:
                         progress = consecutive_count / self.config.FACE_REQUIRED_CONSECUTIVE * 100
                         self.root.after(0, lambda: self.gui.update_detail(
-                            f"👤 KHUÔN MẶT ĐANG XÁC NHẬN: {result.person_name}\n📊 Tiến độ: {consecutive_count}/{self.config.FACE_REQUIRED_CONSECUTIVE} ({progress:.0f}%)\n🎯 Độ chính xác: {result.confidence:.1f}%\n🔊 Tiếp tục nhìn vào camera...", Colors.SUCCESS))
+                            f" KHUÔN MẶT ĐANG XÁC NHẬN: {result.person_name}\n📊 Tiến độ: {consecutive_count}/{self.config.FACE_REQUIRED_CONSECUTIVE} ({progress:.0f}%)\n Độ chính xác: {result.confidence:.1f}%\n🔊 Tiếp tục nhìn vào camera...", Colors.SUCCESS))
                 else:
                     consecutive_count = 0
                 
                 time.sleep(self.config.FACE_DETECTION_INTERVAL)
                 
             except Exception as e:
-                logger.error(f"❌ Any mode face loop error: {e}")
+                logger.error(f" Any mode face loop error: {e}")
                 time.sleep(1)
         
-        logger.debug("🛑 Any mode face loop ended")
+        logger.debug(" Any mode face loop ended")
     
     def _any_mode_fingerprint_loop(self):
         """Fingerprint loop cho any mode + VOICE"""
-        logger.debug("👆 Any mode fingerprint loop started")
+        logger.debug(" Any mode fingerprint loop started")
         
         while (self.running and 
                self.auth_state.is_any_mode() and 
@@ -1049,7 +1049,7 @@ class VietnameseSecuritySystem:
                         
                         if result[0] != -1:
                             # SUCCESS + VOICE
-                            logger.info(f"✅ Any mode fingerprint success: ID {result[0]}")
+                            logger.info(f" Any mode fingerprint success: ID {result[0]}")
                             
                             if self.speaker:
                                 self.speaker.speak("fingerprint_success")
@@ -1057,22 +1057,22 @@ class VietnameseSecuritySystem:
                             self._any_mode_success("fingerprint", f"ID {result[0]}", f"Template match: {result[1]}")
                             return
                         else:
-                            logger.debug(f"👆 Fingerprint not recognized in any mode")
+                            logger.debug(f" Fingerprint not recognized in any mode")
                             
                     except Exception as convert_error:
-                        logger.debug(f"👆 Fingerprint quality issue: {convert_error}")
+                        logger.debug(f" Fingerprint quality issue: {convert_error}")
                 
                 time.sleep(0.5)
                 
             except Exception as e:
-                logger.error(f"❌ Any mode fingerprint error: {e}")
+                logger.error(f" Any mode fingerprint error: {e}")
                 time.sleep(2)
         
         logger.debug("🛑 Any mode fingerprint loop ended")
     
     def _any_mode_rfid_loop(self):
         """RFID loop cho any mode + VOICE"""
-        logger.debug("📱 Any mode RFID loop started")
+        logger.debug(" Any mode RFID loop started")
         
         while (self.running and 
                self.auth_state.is_any_mode() and 
@@ -1082,7 +1082,7 @@ class VietnameseSecuritySystem:
                 
                 if uid:
                     uid_list = list(uid)
-                    logger.debug(f"📱 RFID detected in any mode: {uid_list}")
+                    logger.debug(f" RFID detected in any mode: {uid_list}")
                     
                     # Check if admin card
                     if uid_list == self.config.ADMIN_UID:
@@ -1093,7 +1093,7 @@ class VietnameseSecuritySystem:
                     valid_uids = self.admin_data.get_rfid_uids()
                     if uid_list in valid_uids:
                         # SUCCESS + VOICE
-                        logger.info(f"✅ Any mode RFID success: {uid_list}")
+                        logger.info(f" Any mode RFID success: {uid_list}")
                         
                         if self.speaker:
                             self.speaker.speak("rfid_success")
@@ -1102,18 +1102,18 @@ class VietnameseSecuritySystem:
                         return
                     else:
                         # Invalid card + VOICE
-                        logger.warning(f"📱 Invalid RFID in any mode: {uid_list}")
+                        logger.warning(f" Invalid RFID in any mode: {uid_list}")
                         
                         if self.speaker:
                             self.speaker.speak("auth_failed", "Thẻ từ không hợp lệ")
                         
                         self.root.after(0, lambda: self.gui.update_detail(
-                            f"📱 THẺ TỪ KHÔNG HỢP LỆ!\n🔍 UID phát hiện: {uid_list}\n❌ Thẻ chưa được đăng ký trong hệ thống\n⚡ Các phương thức khác vẫn hoạt động\n🔊 Thử phương thức khác", Colors.ERROR))
+                            f" THẺ TỪ KHÔNG HỢP LỆ!\n🔍 UID phát hiện: {uid_list}\n Thẻ chưa được đăng ký trong hệ thống\n Các phương thức khác vẫn hoạt động\n Thử phương thức khác", Colors.ERROR))
                 
                 time.sleep(1)
                 
             except Exception as e:
-                logger.error(f"❌ Any mode RFID error: {e}")
+                logger.error(f" Any mode RFID error: {e}")
                 time.sleep(3)
         
         logger.debug("🛑 Any mode RFID loop ended")
@@ -1130,14 +1130,14 @@ class VietnameseSecuritySystem:
                 self.speaker.speak("step_passcode")
             
             self.gui.update_detail(
-                "🔑 NHẬP MẬT KHẨU - CHẾ ĐỘ NHANH\nNhập mật khẩu hệ thống để mở khóa ngay\nCác phương thức khác sẽ tạm dừng...", Colors.ACCENT)
+                " NHẬP MẬT KHẨU - CHẾ ĐỘ NHANH\nNhập mật khẩu hệ thống để mở khóa ngay\nCác phương thức khác sẽ tạm dừng...", Colors.ACCENT)
             
             self.root.focus_force()
             self.root.update()
             
             dialog = EnhancedNumpadDialog(
                 self.root, 
-                "🔑 XÁC THỰC NHANH - MẬT KHẨU",
+                " XÁC THỰC NHANH - MẬT KHẨU",
                 "Nhập mật khẩu hệ thống (Chế độ đơn lẻ):", 
                 True, 
                 self.buzzer,
@@ -1157,14 +1157,14 @@ class VietnameseSecuritySystem:
                     self.speaker.speak("", "Hủy nhập mật khẩu")
                 
                 self.gui.update_detail(
-                    "🔑 Nhập mật khẩu đã bị hủy\n⚡ Các phương thức khác tiếp tục hoạt động", Colors.WARNING)
+                    " Nhập mật khẩu đã bị hủy\n⚡ Các phương thức khác tiếp tục hoạt động", Colors.WARNING)
                 return
             
             correct_passcode = self.admin_data.get_passcode()
             
             if entered_pin == correct_passcode:
                 # SUCCESS + VOICE
-                logger.info("✅ Any mode passcode success")
+                logger.info(" Any mode passcode success")
                 
                 if self.speaker:
                     self.speaker.speak("passcode_success")
@@ -1178,7 +1178,7 @@ class VietnameseSecuritySystem:
                     self.speaker.speak("auth_failed", "Mật khẩu không đúng")
                 
                 self.gui.update_detail(
-                    f"🔑 MẬT KHẨU KHÔNG ĐÚNG!\n❌ Mật khẩu không khớp với hệ thống\n⚡ Các phương thức khác vẫn hoạt động\n🔄 Có thể thử lại bằng phím #", Colors.ERROR)
+                    f"🔑 MẬT KHẨU KHÔNG ĐÚNG!\n❌ Mật khẩu không khớp với hệ thống\n⚡ Các phương thức khác vẫn hoạt động\n  Có thể thử lại bằng phím #", Colors.ERROR)
                 self.buzzer.beep("error")
     
     def _any_mode_success(self, method: str, identifier: str, details: str):
@@ -1197,8 +1197,8 @@ class VietnameseSecuritySystem:
                 })
 
             method_names = {
-                "face": "👤 NHẬN DIỆN KHUÔN MẶT",
-                "fingerprint": "👆 SINH TRẮC VÂN TAY",
+                "face": "  NHẬN DIỆN KHUÔN MẶT",
+                "fingerprint": " SINH TRẮC VÂN TAY",
                 "rfid": "📱 THẺ TỪ RFID",
                 "passcode": "🔑 MẬT KHẨU HỆ THỐNG"
             }
@@ -1237,13 +1237,13 @@ class VietnameseSecuritySystem:
 
             # 🎨 MORE DETAILED SUCCESS MESSAGE
             detail_messages = {
-                "face": f"🎉 XÁC THỰC KHUÔN MẶT THÀNH CÔNG!\n✅ Phương thức: Nhận diện AI\n👤 Danh tính: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
-                "fingerprint": f"🎉 XÁC THỰC VÂN TAY THÀNH CÔNG!\n✅ Phương thức: Sinh trắc học\n👆 Vân tay: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
-                "rfid": f"🎉 XÁC THỰC THẺ TỪ THÀNH CÔNG!\n✅ Phương thức: RFID/NFC\n📱 Thẻ: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
-                "passcode": f"🎉 XÁC THỰC MẬT KHẨU THÀNH CÔNG!\n✅ Phương thức: Mã số PIN\n🔑 Trạng thái: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa..."
+                "face": f"🎉 XÁC THỰC KHUÔN MẶT THÀNH CÔNG!\n  Phương thức: Nhận diện AI\n  Danh tính: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
+                "fingerprint": f"🎉 XÁC THỰC VÂN TAY THÀNH CÔNG!\n  Phương thức: Sinh trắc học\n👆 Vân tay: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
+                "rfid": f"🎉 XÁC THỰC THẺ TỪ THÀNH CÔNG!\n  Phương thức: RFID/NFC\n📱 Thẻ: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
+                "passcode": f"🎉 XÁC THỰC MẬT KHẨU THÀNH CÔNG!\n  Phương thức: Mã số PIN\n🔑 Trạng thái: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa..."
             }
 
-            detail_msg = detail_messages.get(method, f"🎉 XÁC THỰC THÀNH CÔNG!\n✅ Phương thức: {method_display}\n🆔 Định danh: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...")
+            detail_msg = detail_messages.get(method, f"🎉 XÁC THỰC THÀNH CÔNG!\n  Phương thức: {method_display}\n🆔 Định danh: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...")
 
             self.gui.update_detail(detail_msg, Colors.SUCCESS)
 
@@ -1252,7 +1252,7 @@ class VietnameseSecuritySystem:
             # Enhanced Discord notification
             if self.discord_bot:
                 discord_msg = f"⚡ **XÁC THỰC ĐƠN LẺ THÀNH CÔNG + VOICE**\n"
-                discord_msg += f"✅ **Phương thức**: {method_display}\n"
+                discord_msg += f"  **Phương thức**: {method_display}\n"
                 discord_msg += f"🆔 **Định danh**: {identifier}\n"
                 discord_msg += f"📋 **Chi tiết**: {details}\n"
                 discord_msg += f"🔊 **Voice**: Vietnamese specific announcements\n"
@@ -1272,7 +1272,7 @@ class VietnameseSecuritySystem:
             self.gui.update_detail(f"Lỗi xử lý thành công: {str(e)}", Colors.ERROR)
     def _face_recognition_loop(self):
         """Vòng lặp nhận diện khuôn mặt cho sequential mode + VOICE"""
-        logger.info("🛡️ Bắt đầu vòng lặp nhận diện khuôn mặt - Sequential mode")
+        logger.info(" Bắt đầu vòng lặp nhận diện khuôn mặt - Sequential mode")
         consecutive_count = 0
         
         while self.running and self.auth_state.step == AuthStep.FACE:
@@ -1297,7 +1297,7 @@ class VietnameseSecuritySystem:
                         Colors.SUCCESS))
                     
                     if consecutive_count >= self.config.FACE_REQUIRED_CONSECUTIVE:
-                        logger.info(f"✅ Sequential face success: {result.person_name}")
+                        logger.info(f"  Sequential face success: {result.person_name}")
                         
                         # VOICE: Success announcement
                         if self.speaker:
@@ -1313,7 +1313,7 @@ class VietnameseSecuritySystem:
                                 daemon=True
                             ).start()
                         
-                        self.root.after(0, lambda: self.gui.update_status(f"✅ BƯỚC 1/4 HOÀN THÀNH: {result.person_name.upper()}!", 'lightgreen'))
+                        self.root.after(0, lambda: self.gui.update_status(f"  BƯỚC 1/4 HOÀN THÀNH: {result.person_name.upper()}!", 'lightgreen'))
                         self.root.after(1500, self._proceed_to_fingerprint)
                         break
                         
@@ -1379,7 +1379,7 @@ class VietnameseSecuritySystem:
                                 
                                 if result[0] != -1:
                                     # SUCCESS + VOICE
-                                    logger.info(f"✅ Sequential fingerprint verified: ID {result[0]}")
+                                    logger.info(f"  Sequential fingerprint verified: ID {result[0]}")
                                     
                                     if self.speaker:
                                         self.speaker.speak("fingerprint_success")
@@ -1394,7 +1394,7 @@ class VietnameseSecuritySystem:
                                             daemon=True
                                         ).start()
                                     
-                                    self.root.after(0, lambda: self.gui.update_status("✅ BƯỚC 2/4 HOÀN THÀNH: VÂN TAY ĐÃ XÁC THỰC!", 'lightgreen'))
+                                    self.root.after(0, lambda: self.gui.update_status("  BƯỚC 2/4 HOÀN THÀNH: VÂN TAY ĐÃ XÁC THỰC!", 'lightgreen'))
                                     self.root.after(1500, self._proceed_to_rfid)
                                     return
                                 else:
@@ -1541,7 +1541,7 @@ class VietnameseSecuritySystem:
                     valid_uids = self.admin_data.get_rfid_uids()
                     if uid_list in valid_uids:
                         # SUCCESS + VOICE
-                        logger.info(f"✅ Sequential RFID verified: {uid_list}")
+                        logger.info(f"  Sequential RFID verified: {uid_list}")
                         
                         if self.speaker:
                             self.speaker.speak("rfid_success")
@@ -1556,7 +1556,7 @@ class VietnameseSecuritySystem:
                                 daemon=True
                             ).start()
                         
-                        self.root.after(0, lambda: self.gui.update_status("✅ BƯỚC 3/4 HOÀN THÀNH: THẺ TỪ ĐÃ XÁC THỰC!", 'lightgreen'))
+                        self.root.after(0, lambda: self.gui.update_status("  BƯỚC 3/4 HOÀN THÀNH: THẺ TỪ ĐÃ XÁC THỰC!", 'lightgreen'))
                         self.root.after(0, lambda: self.gui.update_detail(f"Xác thực thẻ từ thành công!\nMã thẻ: {uid_list}\nChuyển đến bước nhập mật khẩu cuối cùng.", Colors.SUCCESS))
                         self.root.after(1500, self._proceed_to_passcode)
                         return
@@ -1654,7 +1654,7 @@ class VietnameseSecuritySystem:
         self.gui.update_step(4, "NHẬP MẬT KHẨU CUỐI", "Nhập mật khẩu hệ thống", Colors.SUCCESS)
         self.gui.update_status("🛡️ BƯỚC 4/4: NHẬP MẬT KHẨU CUỐI CÙNG", 'lightgreen')
         self.gui.update_detail(
-            "BƯỚC XÁC THỰC CUỐI CÙNG - SEQUENTIAL MODE\n✅ Nhận diện khuôn mặt: THÀNH CÔNG\n✅ Quét vân tay: THÀNH CÔNG\n✅ Quét thẻ từ: THÀNH CÔNG\n🔄 Mật khẩu: ĐANG CHỜ NHẬP\n🔊 Loa sẽ hướng dẫn và thông báo", Colors.SUCCESS)
+            "BƯỚC XÁC THỰC CUỐI CÙNG - SEQUENTIAL MODE\n  Nhận diện khuôn mặt: THÀNH CÔNG\n  Quét vân tay: THÀNH CÔNG\n  Quét thẻ từ: THÀNH CÔNG\n  Mật khẩu: ĐANG CHỜ NHẬP\n🔊 Loa sẽ hướng dẫn và thông báo", Colors.SUCCESS)
         
         self._request_passcode()
 
@@ -1684,7 +1684,7 @@ class VietnameseSecuritySystem:
         
         self.gui.update_step(4, "NHẬP MẬT KHẨU", attempt_msg, Colors.SUCCESS)
         self.gui.update_detail(
-            f"Nhập mật khẩu hệ thống... (Lần thử {self.auth_state.pin_attempts}/{self.config.MAX_ATTEMPTS})\n✅ Các bước trước đã hoàn thành thành công\n🎯 Sử dụng bàn phím số hoặc USB numpad\n🔊 Loa sẽ thông báo kết quả", Colors.SUCCESS)
+            f"Nhập mật khẩu hệ thống... (Lần thử {self.auth_state.pin_attempts}/{self.config.MAX_ATTEMPTS})\n  Các bước trước đã hoàn thành thành công\n🎯 Sử dụng bàn phím số hoặc USB numpad\n🔊 Loa sẽ thông báo kết quả", Colors.SUCCESS)
         
         self.root.focus_force()
         self.root.update()
@@ -1712,7 +1712,7 @@ class VietnameseSecuritySystem:
             if self.speaker:
                 self.speaker.speak("", "Hủy nhập mật khẩu")
             
-            self.gui.update_detail("❌ Việc nhập mật khẩu đã bị hủy\n🔄 Đang khởi động lại xác thực...", Colors.WARNING)
+            self.gui.update_detail("❌ Việc nhập mật khẩu đã bị hủy\n  Đang khởi động lại xác thực...", Colors.WARNING)
             self.buzzer.beep("click")
             self.root.after(2000, self.start_authentication)
             return
@@ -1721,7 +1721,7 @@ class VietnameseSecuritySystem:
         
         if entered_pin == correct_passcode:
             # SUCCESS + VOICE
-            logger.info("✅ Sequential passcode verified - ALL 4 LAYERS COMPLETED!")
+            logger.info("  Sequential passcode verified - ALL 4 LAYERS COMPLETED!")
             
             if self.speaker:
                 self.speaker.speak("passcode_success")
@@ -1730,7 +1730,7 @@ class VietnameseSecuritySystem:
             
             self.gui.update_status("🛡️ XÁC THỰC 4 LỚP HOÀN TẤT! ĐANG MỞ KHÓA CỬA", 'lightgreen')
             self.gui.update_detail(
-                "🎉 XÁC THỰC SEQUENTIAL THÀNH CÔNG!\n✅ Tất cả 4 lớp bảo mật đã được xác minh:\n  👤 Nhận diện khuôn mặt: THÀNH CÔNG\n  👆 Quét vân tay: THÀNH CÔNG\n  📱 Quét thẻ từ: THÀNH CÔNG\n  🔑 Mật khẩu: THÀNH CÔNG\n🔓 Đang mở khóa cửa...\n🔊 Loa đã thông báo hoàn tất", Colors.SUCCESS)
+                "🎉 XÁC THỰC SEQUENTIAL THÀNH CÔNG!\n  Tất cả 4 lớp bảo mật đã được xác minh:\n    Nhận diện khuôn mặt: THÀNH CÔNG\n  👆 Quét vân tay: THÀNH CÔNG\n  📱 Quét thẻ từ: THÀNH CÔNG\n  🔑 Mật khẩu: THÀNH CÔNG\n🔓 Đang mở khóa cửa...\n🔊 Loa đã thông báo hoàn tất", Colors.SUCCESS)
             self.buzzer.beep("success")
             
             # Discord success notification
@@ -1764,7 +1764,7 @@ class VietnameseSecuritySystem:
             self.buzzer.beep("error")
             
             if remaining > 0:
-                error_msg = f"MẬT KHẨU KHÔNG ĐÚNG!\n🔢 Mật khẩu không khớp với hồ sơ hệ thống\n🔄 Còn {remaining} lần thử\n⚠️ Vui lòng xác minh mật khẩu và thử lại\n🔊 Loa đã thông báo lỗi"
+                error_msg = f"MẬT KHẨU KHÔNG ĐÚNG!\n🔢 Mật khẩu không khớp với hồ sơ hệ thống\n  Còn {remaining} lần thử\n⚠️ Vui lòng xác minh mật khẩu và thử lại\n🔊 Loa đã thông báo lỗi"
                 
                 self.gui.update_detail(error_msg, Colors.ERROR)
                 self.root.after(2500, self._request_passcode)
@@ -1785,7 +1785,7 @@ class VietnameseSecuritySystem:
         if self.discord_bot:
             threading.Thread(
                 target=self._send_discord_notification,
-                args=("🔧 **PHÁT HIỆN THẺ QUẢN TRỊ + VOICE**\nThẻ quản trị đã được quét - yêu cầu xác thực mật khẩu\n🔊 Voice guidance active",),
+                args=("  **PHÁT HIỆN THẺ QUẢN TRỊ + VOICE**\nThẻ quản trị đã được quét - yêu cầu xác thực mật khẩu\n🔊 Voice guidance active",),
                 daemon=True
             ).start()
         
@@ -1798,7 +1798,7 @@ class VietnameseSecuritySystem:
         
         dialog = EnhancedNumpadDialog(
             self.root, 
-            "🔧 TRUY CẬP QUẢN TRỊ VIA THẺ TỪ + LOA",
+            " TRUY CẬP QUẢN TRỊ ",
             "Đã phát hiện thẻ quản trị. Nhập mật khẩu quản trị:", 
             True, 
             self.buzzer,
@@ -1820,14 +1820,14 @@ class VietnameseSecuritySystem:
             if self.discord_bot:
                 threading.Thread(
                     target=self._send_discord_notification,
-                    args=(f"✅ **CẤP QUYỀN TRUY CẬP QUẢN TRỊ + VOICE**\nQuản trị viên đã xác thực thành công qua thẻ từ + mật khẩu\nĐang mở bảng điều khiển quản trị với voice support\n🔊 Voice announcements active",),
+                    args=(f"  **CẤP QUYỀN TRUY CẬP QUẢN TRỊ + VOICE**\nQuản trị viên đã xác thực thành công qua thẻ từ + mật khẩu\nĐang mở bảng điều khiển quản trị với voice support\n🔊 Voice announcements active",),
                     daemon=True
                 ).start()
             
-            logger.info("✅ Admin authentication via RFID successful")
+            logger.info("  Admin authentication via RFID successful")
             self.gui.update_status("THẺ QUẢN TRỊ ĐÃ XÁC THỰC! ĐANG MỞ BẢNG ĐIỀU KHIỂN + LOA", 'lightgreen')
             self.gui.update_detail(
-                "🔧 XÁC THỰC QUẢN TRỊ THÀNH CÔNG!\n✅ Thẻ từ quản trị đã được xác minh\n✅ Mật khẩu quản trị đã được xác minh\n🎛️ Đang mở bảng điều khiển với voice support\n🔊 Loa sẽ hướng dẫn trong admin panel", Colors.SUCCESS)
+                "  XÁC THỰC QUẢN TRỊ THÀNH CÔNG!\n  Thẻ từ quản trị đã được xác minh\n  Mật khẩu quản trị đã được xác minh\n🎛️ Đang mở bảng điều khiển với voice support\n🔊 Loa sẽ hướng dẫn trong admin panel", Colors.SUCCESS)
             self.buzzer.beep("success")
             self.admin_gui.show_admin_panel()
             
@@ -1846,7 +1846,7 @@ class VietnameseSecuritySystem:
             logger.warning("❌ Admin card detected but wrong password")
             self.gui.update_status("MẬT KHẨU QUẢN TRỊ KHÔNG ĐÚNG", 'orange')
             self.gui.update_detail(
-                "❌ TỪ CHỐI TRUY CẬP QUẢN TRỊ!\n✅ Thẻ từ quản trị đã được xác minh\n❌ Mật khẩu quản trị không đúng\n⚠️ Vi phạm bảo mật đã được ghi lại\n🔊 Loa đã cảnh báo từ chối truy cập", Colors.ERROR)
+                "❌ TỪ CHỐI TRUY CẬP QUẢN TRỊ!\n  Thẻ từ quản trị đã được xác minh\n❌ Mật khẩu quản trị không đúng\n⚠️ Vi phạm bảo mật đã được ghi lại\n🔊 Loa đã cảnh báo từ chối truy cập", Colors.ERROR)
             self.buzzer.beep("error")
             time.sleep(3)
             self.start_authentication()
@@ -1858,12 +1858,12 @@ class VietnameseSecuritySystem:
             if self.discord_bot:
                 threading.Thread(
                     target=self._send_discord_notification,
-                    args=("🔄 **HỦY TRUY CẬP QUẢN TRỊ + VOICE**\nQuản trị viên đã hủy việc nhập mật khẩu\nĐang quay về xác thực bình thường\n🔊 Voice guidance continues",),
+                    args=("  **HỦY TRUY CẬP QUẢN TRỊ + VOICE**\nQuản trị viên đã hủy việc nhập mật khẩu\nĐang quay về xác thực bình thường\n🔊 Voice guidance continues",),
                     daemon=True
                 ).start()
             
             logger.info("Admin access cancelled")
-            self.gui.update_detail("🔄 Truy cập quản trị đã bị hủy\nĐang quay về xác thực...", Colors.WARNING)
+            self.gui.update_detail("  Truy cập quản trị đã bị hủy\nĐang quay về xác thực...", Colors.WARNING)
             self.start_authentication()
     
     # ==== ENHANCED HELPER METHODS WITH VOICE ====
@@ -1879,7 +1879,7 @@ class VietnameseSecuritySystem:
                     asyncio.run(
                         self.discord_bot.send_authentication_failure_alert(step, attempts, enhanced_details)
                     )
-                    logger.info(f"✅ Discord failure alert sent: {step} (mode: {self.auth_state.auth_mode}) with voice context")
+                    logger.info(f"  Discord failure alert sent: {step} (mode: {self.auth_state.auth_mode}) with voice context")
                 else:
                     logger.warning("Discord bot not available")
             except Exception as e:
@@ -1901,7 +1901,7 @@ class VietnameseSecuritySystem:
                     
                     if details:
                         mode_info = f"Mode: {self.auth_state.auth_mode.upper()} + Voice"
-                        success_message = f"✅ **{step.upper()} XÁC THỰC THÀNH CÔNG + VOICE**\n{details}\n🔧 {mode_info}\n🔊 Vietnamese voice announcements active"
+                        success_message = f"  **{step.upper()} XÁC THỰC THÀNH CÔNG + VOICE**\n{details}\n  {mode_info}\n🔊 Vietnamese voice announcements active"
                         loop.run_until_complete(
                             self.discord_bot.send_security_notification(success_message, "SUCCESS")
                         )
@@ -1929,22 +1929,22 @@ class VietnameseSecuritySystem:
                 if current_mode == "sequential":
                     unlock_message = f"🛡️ **CỬA ĐÃ MỞ KHÓA - SEQUENTIAL MODE + VOICE**\n"
                     unlock_message += f"🎉 Hoàn thành xác thực 4 lớp tuần tự:\n"
-                    unlock_message += f"  ✅ Nhận diện khuôn mặt: THÀNH CÔNG\n"
-                    unlock_message += f"  ✅ Quét vân tay: THÀNH CÔNG\n"
-                    unlock_message += f"  ✅ Quét thẻ từ: THÀNH CÔNG\n"
-                    unlock_message += f"  ✅ Mật khẩu: THÀNH CÔNG\n\n"
+                    unlock_message += f"    Nhận diện khuôn mặt: THÀNH CÔNG\n"
+                    unlock_message += f"    Quét vân tay: THÀNH CÔNG\n"
+                    unlock_message += f"    Quét thẻ từ: THÀNH CÔNG\n"
+                    unlock_message += f"    Mật khẩu: THÀNH CÔNG\n\n"
                     unlock_message += f"🛡️ Độ bảo mật: CAO NHẤT (4 lớp)\n"
                 else:
                     unlock_message = f"⚡ **CỬA ĐÃ MỞ KHÓA - ANY MODE + VOICE**\n"
                     unlock_message += f"🎯 Xác thực đơn lẻ thành công:\n"
                     for success in self.auth_state.any_mode_successes:
                         method_name = {
-                            "face": "👤 Khuôn mặt",
+                            "face": "  Khuôn mặt",
                             "fingerprint": "👆 Vân tay", 
                             "rfid": "📱 Thẻ từ",
                             "passcode": "🔑 Mật khẩu"
                         }.get(success["method"], success["method"])
-                        unlock_message += f"  ✅ {method_name}: {success['identifier']}\n"
+                        unlock_message += f"    {method_name}: {success['identifier']}\n"
                     unlock_message += f"\n⚡ Độ bảo mật: TRUNG BÌNH (1 lớp)\n"
                 
                 unlock_message += f"🔊 Voice: Vietnamese announcements provided\n"
@@ -1973,7 +1973,7 @@ class VietnameseSecuritySystem:
             for i in range(self.config.LOCK_OPEN_DURATION, 0, -1):
                 self.root.after((self.config.LOCK_OPEN_DURATION - i) * 1000, 
                             lambda t=i: self.gui.update_detail(
-                                f"🔓 CỬA ĐANG MỞ\n⏰ Tự động khóa sau {t} giây\n🚶 Vui lòng vào và đóng cửa\n🔧 Chế độ: {current_mode.upper()}\n🔊 Loa đã thông báo mở cửa\n🛡️ Tất cả hệ thống hoạt động bình thường", Colors.SUCCESS))
+                                f"🔓 CỬA ĐANG MỞ\n⏰ Tự động khóa sau {t} giây\n🚶 Vui lòng vào và đóng cửa\n  Chế độ: {current_mode.upper()}\n🔊 Loa đã thông báo mở cửa\n🛡️ Tất cả hệ thống hoạt động bình thường", Colors.SUCCESS))
                 self.root.after((self.config.LOCK_OPEN_DURATION - i) * 1000,
                             lambda t=i: self.gui.update_status(f"CỬA MỞ - KHÓA SAU {t} GIÂY", 'lightgreen'))
                 
@@ -1997,7 +1997,7 @@ class VietnameseSecuritySystem:
             # Enhanced error notification
             if self.discord_bot:
                 error_message = f"❌ **LỖI MỞ KHÓA CỬA + VOICE**\n"
-                error_message += f"🔧 Mode: {self.auth_state.auth_mode}\n"
+                error_message += f"  Mode: {self.auth_state.auth_mode}\n"
                 error_message += f"💥 Lỗi: {str(e)}\n"
                 error_message += f"🔊 Voice: Error announced\n"
                 error_message += f"⚠️ Có thể cần can thiệp thủ công"
@@ -2007,7 +2007,7 @@ class VietnameseSecuritySystem:
                     daemon=True
                 ).start()
             
-            self.gui.update_detail(f"🔧 LỖI MỞ KHÓA CỬA!\n{str(e)}\nVui lòng kiểm tra phần cứng", Colors.ERROR)
+            self.gui.update_detail(f"  LỖI MỞ KHÓA CỬA!\n{str(e)}\nVui lòng kiểm tra phần cứng", Colors.ERROR)
             self.buzzer.beep("error")
 
     def _lock_door(self):
@@ -2026,10 +2026,10 @@ class VietnameseSecuritySystem:
             # Enhanced Discord notification
             if self.discord_bot:
                 lock_message = f"🔒 **CỬA ĐÃ TỰ ĐỘNG KHÓA + INTELLIGENT VOICE**\n"
-                lock_message += f"✅ Cửa đã được bảo mật sau {self.config.LOCK_OPEN_DURATION} giây\n"
-                lock_message += f"🔧 Mode được sử dụng: {current_mode.upper()}\n"
+                lock_message += f"  Cửa đã được bảo mật sau {self.config.LOCK_OPEN_DURATION} giây\n"
+                lock_message += f"  Mode được sử dụng: {current_mode.upper()}\n"
                 lock_message += f"🔊 Voice: Intelligent announcements\n"
-                lock_message += f"🔄 Hệ thống sẵn sàng cho người dùng tiếp theo\n"
+                lock_message += f"  Hệ thống sẵn sàng cho người dùng tiếp theo\n"
                 lock_message += f"📅 Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
                 
                 threading.Thread(
@@ -2040,7 +2040,7 @@ class VietnameseSecuritySystem:
             
             self.gui.update_status("CỬA ĐÃ KHÓA - SẴN SÀNG CHO NGƯỜI DÙNG TIẾP THEO", 'white')
             self.gui.update_detail(
-                f"🔒 CỬA ĐÃ TỰ ĐỘNG KHÓA\n✅ Hệ thống bảo mật đã đặt lại\n🔧 Chế độ hiện tại: {current_mode.upper()}\n🔄 Sẵn sàng cho chu kỳ xác thực tiếp theo\n🛡️ Tất cả sensors đã sẵn sàng", Colors.SUCCESS)
+                f"🔒 CỬA ĐÃ TỰ ĐỘNG KHÓA\n  Hệ thống bảo mật đã đặt lại\n  Chế độ hiện tại: {current_mode.upper()}\n  Sẵn sàng cho chu kỳ xác thực tiếp theo\n🛡️ Tất cả sensors đã sẵn sàng", Colors.SUCCESS)
             self.buzzer.beep("click")
             
             # Reset detection stats và auth state
@@ -2067,7 +2067,7 @@ class VietnameseSecuritySystem:
             if self.discord_bot:
                 critical_message = f"🚨 **NGHIÊM TRỌNG: LỖI KHÓA CỬA + INTELLIGENT VOICE**\n"
                 critical_message += f"❌ Không thể khóa cửa: {str(e)}\n"
-                critical_message += f"🔧 Mode đang chạy: {self.auth_state.auth_mode}\n"
+                critical_message += f"  Mode đang chạy: {self.auth_state.auth_mode}\n"
                 critical_message += f"⚠️ CẦN CAN THIỆP THỦ CÔNG NGAY LẬP TỨC"
                 
                 threading.Thread(
@@ -2083,7 +2083,7 @@ class VietnameseSecuritySystem:
         """🧠 RESET: Reset voice session khi thật sự cần (ví dụ: thay đổi mode)"""
         if hasattr(self, 'speaker') and self.speaker:
             self.speaker.reset_session_announcements()
-            logger.info("🔄 Voice session reset - will announce mode changes again")
+            logger.info("  Voice session reset - will announce mode changes again")
     
     def run(self):
         """Chạy hệ thống chính với Vietnamese Speaker integration"""
@@ -2097,7 +2097,7 @@ class VietnameseSecuritySystem:
             if self.discord_bot:
                 logger.info("Đang khởi động Discord bot...")
                 if self.discord_bot.start_bot():
-                    logger.info("✅ Discord bot đã khởi động thành công!")
+                    logger.info("  Discord bot đã khởi động thành công!")
                 else:
                     logger.warning("⚠️ Không thể khởi động Discord bot")
 
@@ -2112,7 +2112,7 @@ class VietnameseSecuritySystem:
                 self.gui.update_speaker_status(False)
             
             self.gui.update_status("HỆ THỐNG KHÓA CỬA THÔNG MINH v2.4.0 + LOA - SẴN SÀNG!", 'lightgreen')
-            self.gui.update_detail(f"Hệ thống nhận diện đã tải và sẵn sàng\n🔧 Chế độ xác thực: {mode_display}\n🔊 Loa tiếng Việt: {'BẬT' if self.speaker and self.speaker.enabled else 'TẮT'}\n🛡️ Hệ thống bảo mật đa lớp đang hoạt động\n🎵 Voice announcements ready", Colors.SUCCESS)
+            self.gui.update_detail(f"Hệ thống nhận diện đã tải và sẵn sàng\n  Chế độ xác thực: {mode_display}\n🔊 Loa tiếng Việt: {'BẬT' if self.speaker and self.speaker.enabled else 'TẮT'}\n🛡️ Hệ thống bảo mật đa lớp đang hoạt động\n🎵 Voice announcements ready", Colors.SUCCESS)
             
             self.buzzer.beep("startup")
             
@@ -2120,16 +2120,16 @@ class VietnameseSecuritySystem:
             face_info = self.face_recognizer.get_database_info()
             speaker_info = "Google TTS Vietnamese" if (self.speaker and self.speaker.enabled) else "Buzzer Only"
             
-            self.gui.update_detail(f"Trạng thái hệ thống v2.4.0 + Voice:\n👤 Khuôn mặt đã đăng ký: {face_info['total_people']}\n👆 Vân tay: {len(self.admin_data.get_fingerprint_ids())}\n📱 Thẻ từ: {len(self.admin_data.get_rfid_uids())}\n🔧 Chế độ: {mode_display}\n🔊 Audio: {speaker_info}\n🎯 Phiên bản: v2.4.0", Colors.PRIMARY)
+            self.gui.update_detail(f"Trạng thái hệ thống v2.4.0 + Voice:\n  Khuôn mặt đã đăng ký: {face_info['total_people']}\n👆 Vân tay: {len(self.admin_data.get_fingerprint_ids())}\n📱 Thẻ từ: {len(self.admin_data.get_rfid_uids())}\n  Chế độ: {mode_display}\n🔊 Audio: {speaker_info}\n🎯 Phiên bản: v2.4.0", Colors.PRIMARY)
             
             # Enhanced Discord startup notification với voice info
             if self.discord_bot:
                 startup_msg = f"🚀 **HỆ THỐNG KHÓA CỬA v2.4.0 + VIETNAMESE SPEAKER ĐÃ KHỞI ĐỘNG**\n"
-                startup_msg += f"🔧 **Chế độ xác thực**: {mode_display}\n"
-                startup_msg += f"👤 **Khuôn mặt**: {face_info['total_people']} người\n"
+                startup_msg += f"  **Chế độ xác thực**: {mode_display}\n"
+                startup_msg += f"  **Khuôn mặt**: {face_info['total_people']} người\n"
                 startup_msg += f"👆 **Vân tay**: {len(self.admin_data.get_fingerprint_ids())} mẫu\n"
                 startup_msg += f"📱 **Thẻ từ**: {len(self.admin_data.get_rfid_uids())} thẻ\n"
-                startup_msg += f"🔊 **Vietnamese Speaker**: {'✅ Active (Google TTS)' if (self.speaker and self.speaker.enabled) else '❌ Disabled'}\n"
+                startup_msg += f"🔊 **Vietnamese Speaker**: {'  Active (Google TTS)' if (self.speaker and self.speaker.enabled) else '❌ Disabled'}\n"
                 startup_msg += f"🕐 **Thời gian**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
                 startup_msg += f"🛡️ **Trạng thái**: Sẵn sàng hoạt động với voice guidance\n"
                 startup_msg += f"🎵 **Audio Features**: Natural Vietnamese announcements for all actions"
@@ -2152,7 +2152,7 @@ class VietnameseSecuritySystem:
             self.root.protocol("WM_DELETE_WINDOW", self.cleanup)
             
             # Enhanced log
-            logger.info(f"✅ Main loop starting - Mode: {current_mode} + Voice: {'Active' if (self.speaker and self.speaker.enabled) else 'Inactive'}")
+            logger.info(f"  Main loop starting - Mode: {current_mode} + Voice: {'Active' if (self.speaker and self.speaker.enabled) else 'Inactive'}")
             
             # Bắt đầu main loop
             self.root.mainloop()
@@ -2185,7 +2185,7 @@ class VietnameseSecuritySystem:
                 if self.discord_bot.bot:
                     shutdown_msg = f"🔴 **HỆ THỐNG v2.4.0 + VOICE ĐANG TẮT**\n"
                     shutdown_msg += f"🕐 Thời gian: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-                    shutdown_msg += f"🔧 Chế độ cuối: {getattr(self.auth_state, 'auth_mode', 'unknown')}\n"
+                    shutdown_msg += f"  Chế độ cuối: {getattr(self.auth_state, 'auth_mode', 'unknown')}\n"
                     shutdown_msg += f"🔊 Voice: {'Active' if (hasattr(self, 'speaker') and self.speaker and self.speaker.enabled) else 'Inactive'}\n"
                     shutdown_msg += f"📊 Phiên làm việc: Kết thúc với voice support\n"
                     shutdown_msg += f"🔒 Trạng thái cửa: Đã khóa an toàn"
@@ -2229,14 +2229,14 @@ class VietnameseSecuritySystem:
         if hasattr(self, 'root'):
             self.root.quit()
         
-        logger.info("✅ Cleanup hoàn tất - Vietnamese Speaker system shutdown complete")
+        logger.info("  Cleanup hoàn tất - Vietnamese Speaker system shutdown complete")
 
 # ==== MAIN EXECUTION WITH VOICE INTEGRATION ====
 if __name__ == "__main__":
     try:
         print("=" * 100)
         print("HỆ THỐNG KHÓA CỬA THÔNG MINH 4 LỚP BẢO MẬT v2.4.0 + VIETNAMESE SPEAKER")
-        print("   👤 Tác giả: Khoi - Luận án tốt nghiệp")
+        print("     Tác giả: Khoi - Luận án tốt nghiệp")
         print("   📅 Ngày cập nhật: 2025-07-06 06:01:40 UTC")
         print("   🧑‍💻 Cập nhật bởi: KHOI1235567")
         print("   🔊 Nâng cấp: Tích hợp loa tiếng Việt thật, voice thay thế buzzer")
@@ -2252,7 +2252,7 @@ if __name__ == "__main__":
         print("   ✓ Backward compatibility 100% maintained")
         print("   ✓ Thread-safe voice operations")
         print()
-        print("🔧 TECHNICAL ENHANCEMENTS:")
+        print("  TECHNICAL ENHANCEMENTS:")
         print("   ✓ Google TTS Vietnamese voice engine")
         print("   ✓ Pygame audio system với MP3 support")
         print("   ✓ Enhanced buzzer manager với speaker integration")
@@ -2263,7 +2263,7 @@ if __name__ == "__main__":
         print("   ✓ Voice announcements cho all system events")
         print()
         print("4 LỚP BẢO MẬT (Sequential Mode) + VOICE:")
-        print("   1. 👤 Nhận diện khuôn mặt (Camera AI) + Voice guidance")
+        print("   1.   Nhận diện khuôn mặt (Camera AI) + Voice guidance")
         print("   2. 👆 Sinh trắc học vân tay (AS608) + Voice feedback")
         print("   3. 📱 Thẻ từ/NFC (PN532) + Voice confirmations")
         print("   4. 🔑 Mật khẩu số (Numpad) + Voice prompts")
@@ -2289,7 +2289,7 @@ if __name__ == "__main__":
         print("   🎯 Admin actions với voice feedback")
         print("   🚪 Door operations announced")
         print("   ⚠️ Error messages và warnings")
-        print("   🔄 System status updates")
+        print("     System status updates")
         print("   🎛️ Mode changes announced")
         print()
         print("KIỂM TRA PHẦN CỨNG + AUDIO:")
@@ -2340,15 +2340,15 @@ if __name__ == "__main__":
         system = VietnameseSecuritySystem()
         
         print()
-        print("✅ TẤT CẢ THÀNH PHẦN ĐÃ SẴN SÀNG!")
-        print("✅ Enhanced GUI interface loaded!")
-        print("✅ Kết nối phần cứng thành công!")
-        print("✅ Mô hình AI và cấu hình mode đã được tải!")
-        print("✅ Discord integration active!")
-        print("✅ Vietnamese optimization complete!")
+        print("  TẤT CẢ THÀNH PHẦN ĐÃ SẴN SÀNG!")
+        print("  Enhanced GUI interface loaded!")
+        print("  Kết nối phần cứng thành công!")
+        print("  Mô hình AI và cấu hình mode đã được tải!")
+        print("  Discord integration active!")
+        print("  Vietnamese optimization complete!")
         print("🔊 VIETNAMESE SPEAKER READY!")
         print("🎵 Google TTS Vietnamese voice active!")
-        print("🔧 Admin Option 7: Speaker settings available!")
+        print("  Admin Option 7: Speaker settings available!")
         print("🎯 Voice announcements for all system actions!")
         print("=" * 100)
         print("🚀 HỆ THỐNG v2.4.0 + LOA TIẾNG VIỆT SẴN SÀNG! BẮT ĐẦU SỬ DỤNG...")
@@ -2386,7 +2386,7 @@ if __name__ == "__main__":
             print(f"   [{prefix}] {item}")
         
         print()
-        print("🔧 HƯỚNG DẪN KHẮC PHỤC + VOICE:")
+        print("  HƯỚNG DẪN KHẮC PHỤC + VOICE:")
         print("   1. Chạy: sudo python3 -m pip install gtts pygame")
         print("   2. Test speaker: python3 vietnamese_speaker.py")
         print("   3. Kiểm tra: sudo raspi-config → Interface Options → Enable I2C, SPI, Camera")
@@ -2406,7 +2406,7 @@ if __name__ == "__main__":
         print("   🎨 GUI: Enhanced interface v2.4.0 troubleshooting")
         print("   🔊 Voice: Vietnamese speaker troubleshooting guide")
         print()
-        print("🔄 THỬ LẠI:")
+        print("  THỬ LẠI:")
         print("   • Khởi động lại Raspberry Pi")
         print("   • Chạy: sudo systemctl restart khoi-security")
         print("   • Hoặc: python3 KETHOP2_AI_ENHANCED.py (manual)")
@@ -2430,9 +2430,9 @@ if __name__ == "__main__":
         
         # Enhanced error logging với voice context
         logger.error(f"💥 CRITICAL SYSTEM STARTUP FAILURE v2.4.0 + VOICE: {e}")
-        logger.error("🔧 Enhanced GUI + Vietnamese Speaker system failed to initialize")
+        logger.error("  Enhanced GUI + Vietnamese Speaker system failed to initialize")
         logger.error(f"📅 Failure timestamp: 2025-07-06 06:01:40 UTC")
-        logger.error(f"👤 User context: KHOI1235567")
+        logger.error(f"  User context: KHOI1235567")
         logger.error("📊 Error context: Enhanced GUI dual authentication mode + voice system")
         logger.error("🔊 Voice context: Vietnamese Speaker integration failure")
         
@@ -2442,8 +2442,8 @@ if __name__ == "__main__":
                 error_msg = f"💥 **CRITICAL SYSTEM FAILURE v2.4.0 + VOICE**\n"
                 error_msg += f"❌ **Error**: {str(e)}\n"
                 error_msg += f"🕐 **Time**: 2025-07-06 06:01:40 UTC\n"
-                error_msg += f"👤 **User**: KHOI1235567\n"
-                error_msg += f"🔧 **Context**: Enhanced GUI dual auth mode + Vietnamese Speaker\n"
+                error_msg += f"  **User**: KHOI1235567\n"
+                error_msg += f"  **Context**: Enhanced GUI dual auth mode + Vietnamese Speaker\n"
                 error_msg += f"🎨 **GUI**: v2.4.0 interface initialization failure\n"
                 error_msg += f"🔊 **Voice**: Vietnamese Speaker integration failure\n"
                 error_msg += f"⚠️ **Status**: System offline - manual intervention required"
@@ -2470,24 +2470,24 @@ if __name__ == "__main__":
         print("=" * 100)
         print("🛑 HỆ THỐNG v2.4.0 + VOICE DỪNG THEO YÊU CẦU NGƯỜI DÙNG")
         print("📅 Thời gian dừng: 2025-07-06 06:01:40 UTC")
-        print("👤 Người dùng: KHOI1235567")
-        print("🔧 Trạng thái: Tắt an toàn - Enhanced GUI + Vietnamese Speaker")
+        print("  Người dùng: KHOI1235567")
+        print("  Trạng thái: Tắt an toàn - Enhanced GUI + Vietnamese Speaker")
         print("=" * 100)
         
         # Graceful shutdown logging với voice context
         logger.info("🛑 User requested system shutdown via KeyboardInterrupt")
-        logger.info("✅ Enhanced GUI + Vietnamese Speaker graceful shutdown sequence initiated")
+        logger.info("  Enhanced GUI + Vietnamese Speaker graceful shutdown sequence initiated")
         
         # Try to send shutdown notification
         try:
             if 'system' in locals() and hasattr(system, 'discord_bot') and system.discord_bot:
                 shutdown_msg = f"🛑 **HỆ THỐNG DỪNG AN TOÀN v2.4.0 + VOICE**\n"
-                shutdown_msg += f"👤 **Người dùng**: KHOI1235567\n"
+                shutdown_msg += f"  **Người dùng**: KHOI1235567\n"
                 shutdown_msg += f"🕐 **Thời gian**: 2025-07-06 06:01:40 UTC\n"
-                shutdown_msg += f"🔧 **Lý do**: Manual shutdown (Ctrl+C)\n"
+                shutdown_msg += f"  **Lý do**: Manual shutdown (Ctrl+C)\n"
                 shutdown_msg += f"🎨 **GUI**: Enhanced interface v2.4.0\n"
                 shutdown_msg += f"🔊 **Voice**: Vietnamese Speaker integrated\n"
-                shutdown_msg += f"✅ **Trạng thái**: Clean shutdown - Không mất dữ liệu"
+                shutdown_msg += f"  **Trạng thái**: Clean shutdown - Không mất dữ liệu"
                 
                 import asyncio
                 try:
@@ -2503,7 +2503,7 @@ if __name__ == "__main__":
         except:
             pass
         
-        print("✅ Tắt hệ thống enhanced GUI + Vietnamese Speaker hoàn tất an toàn!")
+        print("  Tắt hệ thống enhanced GUI + Vietnamese Speaker hoàn tất an toàn!")
         exit(0)
     
     finally:
@@ -2512,7 +2512,7 @@ if __name__ == "__main__":
             if 'system' in locals():
                 print("🧹 Thực hiện cleanup cuối cùng enhanced GUI + Voice...")
                 system.cleanup()
-                print("✅ Enhanced GUI + Vietnamese Speaker cleanup hoàn tất")
+                print("  Enhanced GUI + Vietnamese Speaker cleanup hoàn tất")
         except:
             pass
         
@@ -2520,8 +2520,8 @@ if __name__ == "__main__":
         print("=" * 100)
         print("🏁 HỆ THỐNG KHÓA CỬA THÔNG MINH v2.4.0 + VIETNAMESE SPEAKER - KẾT THÚC")
         print("   📅 Kết thúc: 2025-07-06 06:01:40 UTC")
-        print("   👤 Session user: KHOI1235567")
-        print("   🔧 Version: Enhanced GUI Dual Authentication Mode + Vietnamese Speaker")
+        print("     Session user: KHOI1235567")
+        print("     Version: Enhanced GUI Dual Authentication Mode + Vietnamese Speaker")
         print("   🎨 Interface: Vietnamese Optimized v2.4.0")
         print("   🔊 Audio: Google TTS Vietnamese Voice Integration")
         print("   📊 Status: Program terminated với voice support")
