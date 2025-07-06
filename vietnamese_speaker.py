@@ -75,7 +75,7 @@ class VietnameseSpeaker:
             
             # Success messages - SHORTER
             "face_success": "Nhận diện thành công",
-            "fingerprint_success": "Vân tay OK",
+            "fingerprint_success": "Vân tay hợp lệ",
             "rfid_success": "Thẻ hợp lệ",
             "passcode_success": "Mật khẩu đúng",
             "auth_complete": "Hoàn tất",
@@ -104,7 +104,7 @@ class VietnameseSpeaker:
             "success": "",  # REMOVE SUCCESS SOUND - TOO FREQUENT
             "error": "Lỗi",
             "click": "",    # REMOVE CLICK SOUND - TOO FREQUENT
-            "warning": "Cảnh báo",
+            "warning": "Xác nhận",
             "startup": "",  # REMOVE STARTUP SOUND
             "mode_change": ""  # HANDLE BY SPECIFIC MODE MESSAGES
         }
@@ -127,7 +127,7 @@ class VietnameseSpeaker:
         if enabled:
             self._init_audio_system()
         
-        logger.info(f"✅ Vietnamese Speaker v3.1 - Intelligent Voice Logic")
+        logger.info(f"  Vietnamese Speaker v3.1 - Intelligent Voice Logic")
     
     def _detect_best_method(self):
         """Detect best TTS method"""
@@ -145,7 +145,7 @@ class VietnameseSpeaker:
                 import pygame
                 pygame.mixer.init(frequency=22050, size=-16, channels=2, buffer=512)
                 self.pygame_initialized = True
-                logger.info("✅ Pygame audio system ready")
+                logger.info("  Pygame audio system ready")
         except Exception as e:
             logger.warning(f"Pygame init failed: {e}")
             self.pygame_initialized = False
@@ -229,7 +229,7 @@ class VietnameseSpeaker:
                 while pygame.mixer.music.get_busy():
                     time.sleep(0.1)
                 
-                logger.debug("✅ Google TTS Vietnamese played")
+                logger.debug("  Google TTS Vietnamese played")
                 return True
                 
             finally:
@@ -262,7 +262,7 @@ class VietnameseSpeaker:
                 else:
                     return False
                 
-                logger.debug("✅ Google TTS Vietnamese (system)")
+                logger.debug("  Google TTS Vietnamese (system)")
                 return True
                 
             finally:
@@ -281,7 +281,7 @@ class VietnameseSpeaker:
             subprocess.run([
                 'espeak', '-v', 'vi', '-s', '150', '-p', '50', '-a', '70', message
             ], capture_output=True, timeout=5)
-            logger.debug("✅ espeak Vietnamese fallback")
+            logger.debug("  espeak Vietnamese fallback")
         except Exception as e:
             logger.debug(f"espeak failed: {e}")
     
@@ -386,7 +386,7 @@ class VietnameseSpeaker:
     
     def reset_session_announcements(self):
         """🧠 RESET: Reset session announcements - call when truly starting new session"""
-        logger.info("🔄 Resetting voice session announcements")
+        logger.info("  Resetting voice session announcements")
         self.session_announced = {
             "mode_sequential": False,
             "mode_any": False,
@@ -462,7 +462,7 @@ class VietnameseSpeaker:
             except:
                 pass
         
-        logger.info("✅ Vietnamese Speaker cleanup complete")
+        logger.info("  Vietnamese Speaker cleanup complete")
 
 # Compatibility
 LoaTiengViet = VietnameseSpeaker
@@ -494,4 +494,4 @@ if __name__ == "__main__":
         time.sleep(2)
     
     speaker.cleanup()
-    print("✅ OPTIMIZED integration test complete!")
+    print("  OPTIMIZED integration test complete!")
