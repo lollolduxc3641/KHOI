@@ -1205,7 +1205,7 @@ class VietnameseSecuritySystem:
 
             method_display = method_names.get(method, method.upper())
 
-            logger.info(f"🎉 ANY MODE SUCCESS: {method} - {identifier}")
+            logger.info(f"  ANY MODE SUCCESS: {method} - {identifier}")
 
             # 🔊 ENHANCED VOICE - More specific announcements
             if self.speaker:
@@ -1237,13 +1237,13 @@ class VietnameseSecuritySystem:
 
             # 🎨 MORE DETAILED SUCCESS MESSAGE
             detail_messages = {
-                "face": f"🎉 XÁC THỰC KHUÔN MẶT THÀNH CÔNG!\n  Phương thức: Nhận diện AI\n  Danh tính: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
-                "fingerprint": f"🎉 XÁC THỰC VÂN TAY THÀNH CÔNG!\n  Phương thức: Sinh trắc học\n👆 Vân tay: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
-                "rfid": f"🎉 XÁC THỰC THẺ TỪ THÀNH CÔNG!\n  Phương thức: RFID/NFC\n📱 Thẻ: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
-                "passcode": f"🎉 XÁC THỰC MẬT KHẨU THÀNH CÔNG!\n  Phương thức: Mã số PIN\n🔑 Trạng thái: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa..."
+                "face": f"  XÁC THỰC KHUÔN MẶT THÀNH CÔNG!\n  Phương thức: Nhận diện AI\n  Danh tính: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
+                "fingerprint": f"  XÁC THỰC VÂN TAY THÀNH CÔNG!\n  Phương thức: Sinh trắc học\n  Vân tay: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
+                "rfid": f"  XÁC THỰC THẺ TỪ THÀNH CÔNG!\n  Phương thức: RFID/NFC\n📱 Thẻ: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...",
+                "passcode": f"  XÁC THỰC MẬT KHẨU THÀNH CÔNG!\n  Phương thức: Mã số PIN\n🔑 Trạng thái: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa..."
             }
 
-            detail_msg = detail_messages.get(method, f"🎉 XÁC THỰC THÀNH CÔNG!\n  Phương thức: {method_display}\n🆔 Định danh: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...")
+            detail_msg = detail_messages.get(method, f"  XÁC THỰC THÀNH CÔNG!\n  Phương thức: {method_display}\n🆔 Định danh: {identifier}\n📋 Chi tiết: {details}\n🔓 Đang mở khóa cửa...")
 
             self.gui.update_detail(detail_msg, Colors.SUCCESS)
 
@@ -1730,7 +1730,7 @@ class VietnameseSecuritySystem:
             
             self.gui.update_status("🛡️ XÁC THỰC 4 LỚP HOÀN TẤT! ĐANG MỞ KHÓA CỬA", 'lightgreen')
             self.gui.update_detail(
-                "🎉 XÁC THỰC SEQUENTIAL THÀNH CÔNG!\n  Tất cả 4 lớp bảo mật đã được xác minh:\n    Nhận diện khuôn mặt: THÀNH CÔNG\n  👆 Quét vân tay: THÀNH CÔNG\n  📱 Quét thẻ từ: THÀNH CÔNG\n  🔑 Mật khẩu: THÀNH CÔNG\n🔓 Đang mở khóa cửa...\n🔊 Loa đã thông báo hoàn tất", Colors.SUCCESS)
+                "  XÁC THỰC SEQUENTIAL THÀNH CÔNG!\n  Tất cả 4 lớp bảo mật đã được xác minh:\n    Nhận diện khuôn mặt: THÀNH CÔNG\n    Quét vân tay: THÀNH CÔNG\n  📱 Quét thẻ từ: THÀNH CÔNG\n  🔑 Mật khẩu: THÀNH CÔNG\n🔓 Đang mở khóa cửa...\n🔊 Loa đã thông báo hoàn tất", Colors.SUCCESS)
             self.buzzer.beep("success")
             
             # Discord success notification
@@ -1928,7 +1928,7 @@ class VietnameseSecuritySystem:
             if self.discord_bot:
                 if current_mode == "sequential":
                     unlock_message = f"🛡️ **CỬA ĐÃ MỞ KHÓA - SEQUENTIAL MODE + VOICE**\n"
-                    unlock_message += f"🎉 Hoàn thành xác thực 4 lớp tuần tự:\n"
+                    unlock_message += f"  Hoàn thành xác thực 4 lớp tuần tự:\n"
                     unlock_message += f"    Nhận diện khuôn mặt: THÀNH CÔNG\n"
                     unlock_message += f"    Quét vân tay: THÀNH CÔNG\n"
                     unlock_message += f"    Quét thẻ từ: THÀNH CÔNG\n"
@@ -1940,7 +1940,7 @@ class VietnameseSecuritySystem:
                     for success in self.auth_state.any_mode_successes:
                         method_name = {
                             "face": "  Khuôn mặt",
-                            "fingerprint": "👆 Vân tay", 
+                            "fingerprint": "  Vân tay", 
                             "rfid": "📱 Thẻ từ",
                             "passcode": "🔑 Mật khẩu"
                         }.get(success["method"], success["method"])
@@ -2120,14 +2120,14 @@ class VietnameseSecuritySystem:
             face_info = self.face_recognizer.get_database_info()
             speaker_info = "Google TTS Vietnamese" if (self.speaker and self.speaker.enabled) else "Buzzer Only"
             
-            self.gui.update_detail(f"Trạng thái hệ thống v2.4.0 + Voice:\n  Khuôn mặt đã đăng ký: {face_info['total_people']}\n👆 Vân tay: {len(self.admin_data.get_fingerprint_ids())}\n📱 Thẻ từ: {len(self.admin_data.get_rfid_uids())}\n  Chế độ: {mode_display}\n🔊 Audio: {speaker_info}\n🎯 Phiên bản: v2.4.0", Colors.PRIMARY)
+            self.gui.update_detail(f"Trạng thái hệ thống v2.4.0 + Voice:\n  Khuôn mặt đã đăng ký: {face_info['total_people']}\n  Vân tay: {len(self.admin_data.get_fingerprint_ids())}\n📱 Thẻ từ: {len(self.admin_data.get_rfid_uids())}\n  Chế độ: {mode_display}\n🔊 Audio: {speaker_info}\n🎯 Phiên bản: v2.4.0", Colors.PRIMARY)
             
             # Enhanced Discord startup notification với voice info
             if self.discord_bot:
                 startup_msg = f"🚀 **HỆ THỐNG KHÓA CỬA v2.4.0 + VIETNAMESE SPEAKER ĐÃ KHỞI ĐỘNG**\n"
                 startup_msg += f"  **Chế độ xác thực**: {mode_display}\n"
                 startup_msg += f"  **Khuôn mặt**: {face_info['total_people']} người\n"
-                startup_msg += f"👆 **Vân tay**: {len(self.admin_data.get_fingerprint_ids())} mẫu\n"
+                startup_msg += f"  **Vân tay**: {len(self.admin_data.get_fingerprint_ids())} mẫu\n"
                 startup_msg += f"📱 **Thẻ từ**: {len(self.admin_data.get_rfid_uids())} thẻ\n"
                 startup_msg += f"🔊 **Vietnamese Speaker**: {'  Active (Google TTS)' if (self.speaker and self.speaker.enabled) else '❌ Disabled'}\n"
                 startup_msg += f"🕐 **Thời gian**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
@@ -2264,7 +2264,7 @@ if __name__ == "__main__":
         print()
         print("4 LỚP BẢO MẬT (Sequential Mode) + VOICE:")
         print("   1.   Nhận diện khuôn mặt (Camera AI) + Voice guidance")
-        print("   2. 👆 Sinh trắc học vân tay (AS608) + Voice feedback")
+        print("   2.   Sinh trắc học vân tay (AS608) + Voice feedback")
         print("   3. 📱 Thẻ từ/NFC (PN532) + Voice confirmations")
         print("   4. 🔑 Mật khẩu số (Numpad) + Voice prompts")
         print()
@@ -2518,17 +2518,12 @@ if __name__ == "__main__":
         
         print()
         print("=" * 100)
-        print("🏁 HỆ THỐNG KHÓA CỬA THÔNG MINH v2.4.0 + VIETNAMESE SPEAKER - KẾT THÚC")
         print("   📅 Kết thúc: 2025-07-06 06:01:40 UTC")
-        print("     Session user: KHOI1235567")
         print("     Version: Enhanced GUI Dual Authentication Mode + Vietnamese Speaker")
         print("   🎨 Interface: Vietnamese Optimized v2.4.0")
         print("   🔊 Audio: Google TTS Vietnamese Voice Integration")
         print("   📊 Status: Program terminated với voice support")
         print("=" * 100)
-        print("🙏 Cảm ơn bạn đã sử dụng hệ thống bảo mật Enhanced GUI + Voice của Khoi!")
-        print("📧 Phản hồi và góp ý: support@khoisecurity.local")
-        print("🎓 Luận án tốt nghiệp - Đại học Công nghệ Thông tin")
         print("🎨 Enhanced GUI Interface - Optimized for Vietnamese users")
         print("🔊 Vietnamese Speaker - Natural voice announcements")
         print("🎵 Google TTS Integration - Real Vietnamese voice experience")
